@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-big-counter.min.css">
   <script src="/lib/pace/pace.min.js"></script>
+  <script data-ad-client="ca-pub-8235718069863570" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
@@ -24,14 +25,14 @@
 
   <meta name="description" content="位宽检测每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。检测机理如下：如上图所示：上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了： 1. 8位模式判断数据按字节输入： 100-&gt;00-&gt;00-&gt;BB-&gt;11-&gt;22-&gt;00-&gt;44-&gt;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="(Xilinx-7系配置介绍之二) 位流位宽检测机理">
+<meta property="og:title" content="(Xilinx-7系配置) 位流位宽检测机理">
 <meta property="og:url" content="https://www.cdutcl.com/2020/03/11/xilinx-7series-config2/index.html">
 <meta property="og:site_name" content="CDUTCL">
 <meta property="og:description" content="位宽检测每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。检测机理如下：如上图所示：上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了： 1. 8位模式判断数据按字节输入： 100-&gt;00-&gt;00-&gt;BB-&gt;11-&gt;22-&gt;00-&gt;44-&gt;">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://s1.ax1x.com/2020/03/12/8ZMWQK.png">
 <meta property="article:published_time" content="2020-03-11T12:49:06.000Z">
-<meta property="article:modified_time" content="2020-03-12T04:17:37.542Z">
+<meta property="article:modified_time" content="2020-03-12T07:05:52.892Z">
 <meta property="article:author" content="cdutcl">
 <meta property="article:tag" content="XILINX">
 <meta name="twitter:card" content="summary">
@@ -49,7 +50,7 @@
   };
 </script>
 
-  <title>(Xilinx-7系配置介绍之二) 位流位宽检测机理 | CDUTCL</title>
+  <title>(Xilinx-7系配置) 位流位宽检测机理 | CDUTCL</title>
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-159222686-1"></script>
     <script>
@@ -227,7 +228,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          (Xilinx-7系配置介绍之二) 位流位宽检测机理
+          (Xilinx-7系配置) 位流位宽检测机理
         </h1>
 
         <div class="post-meta">
@@ -244,7 +245,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020/03/12 12:17:37" itemprop="dateModified" datetime="2020-03-12T12:17:37+08:00">2020/03/12</time>
+                <time title="修改时间：2020/03/12 15:05:52" itemprop="dateModified" datetime="2020-03-12T15:05:52+08:00">2020/03/12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -355,8 +356,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/03/11/xilinx-7series-config1/" rel="prev" title="(Xilinx-7系配置介绍之一) 数据文件格式">
-      <i class="fa fa-chevron-left"></i> (Xilinx-7系配置介绍之一) 数据文件格式
+    <a href="/2020/03/11/xilinx-7series-config1/" rel="prev" title="(Xilinx-7系配置) 数据文件格式">
+      <i class="fa fa-chevron-left"></i> (Xilinx-7系配置) 数据文件格式
     </a></div>
       <div class="post-nav-item">
     <a href="/2020/03/12/vim-coding/" rel="next" title="VIM笔记-中文乱码问题">
@@ -463,6 +464,39 @@
       </span>
   </div>
 
+
+
+    <div class="links-of-blogroll motion-element links-of-blogroll-block">
+      <div class="links-of-blogroll-title">
+        <!-- modify icon to fire by szw -->
+        <i class="fa fa-history fa-" aria-hidden="true"></i>
+        近期文章
+      </div>
+      <ul class="links-of-blogroll-list">
+        
+        
+          <li>
+            <a href="/2020/03/12/vim-coding/" title="VIM笔记-中文乱码问题" target="_blank">VIM笔记-中文乱码问题</a>
+          </li>
+        
+          <li>
+            <a href="/2020/03/11/xilinx-7series-config2/" title="(Xilinx-7系配置) 位流位宽检测机理" target="_blank">(Xilinx-7系配置) 位流位宽检测机理</a>
+          </li>
+        
+          <li>
+            <a href="/2020/03/11/xilinx-7series-config1/" title="(Xilinx-7系配置) 数据文件格式" target="_blank">(Xilinx-7系配置) 数据文件格式</a>
+          </li>
+        
+          <li>
+            <a href="/2020/03/09/linux-ubuntu-cn/" title="Ubuntu18.04安装中文支持" target="_blank">Ubuntu18.04安装中文支持</a>
+          </li>
+        
+          <li>
+            <a href="/2020/03/09/xilinx-zynq-address/" title="Zynq外设之--地址空间" target="_blank">Zynq外设之--地址空间</a>
+          </li>
+        
+      </ul>
+    </div>
 
 
       </div>

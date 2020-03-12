@@ -2,6 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://www.cdutcl.com/about/index.html</loc>
+    
+    <lastmod>2020-03-12T07:16:13.502Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.cdutcl.com/2020/03/09/linux-ubuntu-cn/</loc>
+    
+    <lastmod>2020-03-12T07:06:17.819Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.cdutcl.com/2020/03/11/xilinx-7series-config2/</loc>
+    
+    <lastmod>2020-03-12T07:05:52.892Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.cdutcl.com/2020/03/11/xilinx-7series-config1/</loc>
+    
+    <lastmod>2020-03-12T07:05:41.469Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.cdutcl.com/2020/03/02/ebaz4205-ubooterr1/</loc>
     
     <lastmod>2020-03-12T04:56:42.065Z</lastmod>
@@ -51,13 +79,6 @@
   </url>
   
   <url>
-    <loc>https://www.cdutcl.com/2020/03/09/linux-ubuntu-cn/</loc>
-    
-    <lastmod>2020-03-12T04:33:06.403Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.cdutcl.com/2020/03/04/linux-patch-command/</loc>
     
     <lastmod>2020-03-12T04:31:55.705Z</lastmod>
@@ -89,27 +110,6 @@
     <loc>https://www.cdutcl.com/2020/02/27/linux-git-remote/</loc>
     
     <lastmod>2020-03-12T04:23:08.016Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.cdutcl.com/2020/03/11/xilinx-7series-config2/</loc>
-    
-    <lastmod>2020-03-12T04:17:37.542Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.cdutcl.com/2020/03/11/xilinx-7series-config1/</loc>
-    
-    <lastmod>2020-03-12T04:16:23.184Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.cdutcl.com/about/index.html</loc>
-    
-    <lastmod>2020-03-12T03:32:00.182Z</lastmod>
     
   </url>
   

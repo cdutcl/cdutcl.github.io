@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>CDUTCL</title>
+  
+  <subtitle>cdutcl@gmail.com</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://www.cdutcl.com/"/>
+  <updated>2020-03-12T03:16:23.568Z</updated>
+  <id>https://www.cdutcl.com/</id>
+  
+  <author>
+    <name>cdutcl</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>VIM笔记-中文乱码问题</title>
+    <link href="https://www.cdutcl.com/2020/03/12/vim-coding/"/>
+    <id>https://www.cdutcl.com/2020/03/12/vim-coding/</id>
+    <published>2020-03-12T01:23:37.000Z</published>
+    <updated>2020-03-12T03:16:23.568Z</updated>
+    
+    <content type="html"><![CDATA[<p>由于工作需要，可能经常需要在Windows和Linux两个环境中切换。Vim乱码一直是让我头疼的一个事情，网上描述该问题的文章有很多，但都是直接说怎么做的，没有讲清楚其中的原理，所以整理这篇文章，希望能把该问题彻底解释清楚：  </p><h2 id="1-默认编码"><a href="#1-默认编码" class="headerlink" title="1. 默认编码"></a>1. 默认编码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Windows中默认的文本编码是cp936，而Linux一般都是utf-8</span><br></pre></td></tr></table></figure><h2 id="2-查看文件编码"><a href="#2-查看文件编码" class="headerlink" title="2. 查看文件编码"></a>2. 查看文件编码</h2><p>当你打开一个文本后，你可以在vim中输入下面命令查看文本编码：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">:set fileencoding</span><br></pre></td></tr></table></figure><p>很多文章都是像上面这样描述，很容易让人误解。其实，上面这条命令并不是说查看文件的编码，而是vim自动识别的文件编码。所以，第一个乱码原因来了：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">如果vim错误的识别了文件编码，用其他编码来打开文件，就可能会出现乱码</span><br></pre></td></tr></table></figure><p>这时，vim已经用它认为的编码模式打开了文本，vim就会按照fileencoding这个编码格式来处理文本，当你修改并保存文件时，vim就会以这个编码格式来保存文本。如果编码格式错乱了，那么，很可能你这个文本就全乱了。</p><h2 id="3-用什么编码打开文本"><a href="#3-用什么编码打开文本" class="headerlink" title="3. 用什么编码打开文本"></a>3. 用什么编码打开文本</h2><p>由于文本的编码格式有很多，所以vim很可能识别错文本编码。这时fileencodings这个变量就出来了，根据文本的编码特征建议设置变量如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">:set fileencodings&#x3D;ucs-bom,utf-8,cp936</span><br></pre></td></tr></table></figure><p>这样设置以后，vim就会按照你列出的编码方式，依次去判断文本编码。有时即使是这样，vim还是有可能会识别错文本编码。但如果你事先知道文本的正确编码，你可以用下面的命令，强制用某种编码去打开文本：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vim file.txt -c &quot;e ++enc&#x3D;utf-8&quot;</span><br></pre></td></tr></table></figure><h2 id="4-亡羊补牢"><a href="#4-亡羊补牢" class="headerlink" title="4. 亡羊补牢"></a>4. 亡羊补牢</h2><p>如果你已经打开了一个文本，而vim用的编码方式又错了，这时你可以用下面的命令切换一种编码方式去打开该文件：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">:edit ++enc&#x3D;utf-8</span><br></pre></td></tr></table></figure><h2 id="5-保存文件"><a href="#5-保存文件" class="headerlink" title="5. 保存文件"></a>5. 保存文件</h2><p>如前文所说，当你编辑好文件，需要保存文本时，首先文件内容就是按照变量fileencoding的格式来保存，但另外还有一个变量需要注意：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">:set fileformat</span><br></pre></td></tr></table></figure><p>这个变量不影响文件编码，但是它会影响换行。这个有dos格式和unix格式，一般在vim下面的状态栏里面会显示该文件的格式。如果是dos格式，在linux下面打开时，行结尾会多一个^M(\r)。删除^M的方法如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%s&#x2F;\r&#x2F;&#x2F;g</span><br></pre></td></tr></table></figure><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;由于工作需要，可能经常需要在Windows和Linux两个环境中切换。Vim乱码一直是让我头疼的一个事情，网上描述该问题的文章有很多，但都是直接说怎么做的，没有讲清楚其中的原理，所以整理这篇文章，希望能把该问题彻底解释清楚：  &lt;/p&gt;
+&lt;h2 id=&quot;1-默认编码&quot;&gt;&lt;a
+      
+    
+    </summary>
+    
+    
+    
+      <category term="Vim" scheme="https://www.cdutcl.com/tags/Vim/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>(Xilinx-7系配置介绍之二) 位流位宽检测机理</title>
+    <link href="https://www.cdutcl.com/2020/03/11/xilinx-7series-config2/"/>
+    <id>https://www.cdutcl.com/2020/03/11/xilinx-7series-config2/</id>
+    <published>2020-03-11T12:49:06.000Z</published>
+    <updated>2020-03-12T04:17:37.542Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="位宽检测"><a href="#位宽检测" class="headerlink" title="位宽检测"></a>位宽检测</h2><p>每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。<br>检测机理如下：<br><img src="https://s1.ax1x.com/2020/03/12/8ZMWQK.png" alt="8ZMWQK.png"><br>如上图所示：<br>上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了：</p><h3 id="1-8位模式判断"><a href="#1-8位模式判断" class="headerlink" title="1. 8位模式判断"></a>1. 8位模式判断</h3><p>数据按字节输入：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">00-&gt;00-&gt;00-&gt;BB-&gt;11-&gt;22-&gt;00-&gt;44-&gt;</span><br></pre></td></tr></table></figure><p>判断到BB后紧跟着11，说明总线是8位宽度；</p><h3 id="2-16位模式判断"><a href="#2-16位模式判断" class="headerlink" title="2. 16位模式判断"></a>2. 16位模式判断</h3><p>数据按双字节输入：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0000-&gt;00BB-&gt;1122-&gt;0044-&gt;</span><br></pre></td></tr></table></figure><p>低8位中，BB后紧跟着22，说明总线是16位宽度；</p><h3 id="3-32位模式判断"><a href="#3-32位模式判断" class="headerlink" title="3. 32位模式判断"></a>3. 32位模式判断</h3><p>数据按四字节输入：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">000000BB-&gt;11220044-&gt;</span><br></pre></td></tr></table></figure><p>低8位中，BB后紧跟着44，说明总线是32位宽度；</p><p>根据如上机理，即可判断总线宽度。</p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;位宽检测&quot;&gt;&lt;a href=&quot;#位宽检测&quot; class=&quot;headerlink&quot; title=&quot;位宽检测&quot;&gt;&lt;/a&gt;位宽检测&lt;/h2&gt;&lt;p&gt;每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。&lt;br&gt;检测机理如下：&lt;br&gt;&lt;img sr
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>(Xilinx-7系配置介绍之一) 数据文件格式</title>
+    <link href="https://www.cdutcl.com/2020/03/11/xilinx-7series-config1/"/>
+    <id>https://www.cdutcl.com/2020/03/11/xilinx-7series-config1/</id>
+    <published>2020-03-11T11:33:10.000Z</published>
+    <updated>2020-03-12T04:16:23.184Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="配置文件后缀"><a href="#配置文件后缀" class="headerlink" title="配置文件后缀"></a>配置文件后缀</h2><h3 id="1-bit："><a href="#1-bit：" class="headerlink" title="1. bit："></a>1. bit：</h3><p>默认生成文件类型，包含一些冗余的头部信息，这些头部信息是不需要下载到FPGA里面的。bit文件可以直接通过jtag加载到fpga中，掉电消失。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMmGt.png" alt="8ZMmGt.png"></p><h3 id="2-rbt："><a href="#2-rbt：" class="headerlink" title="2. rbt："></a>2. rbt：</h3><p>在ISE中使能了-b选项、在vivado中使能了-raw_bitfile选项，就可以生成该文件，该文件内容和bit一致，只是说这个是ASCII格式，bit是bin格式。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMePI.png" alt="8ZMePI.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMVIA.png" alt="8ZMVIA.png"></p><h3 id="3-bin："><a href="#3-bin：" class="headerlink" title="3. bin："></a>3. bin：</h3><p>在ISE中使能了-g binary:yes选项、在vivado中使能了-bin_file选项，就可以生成该文件，该文件内容相当于bit文件剔除了头部冗余信息。后面完全一致。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMAVH.png" alt="8ZMAVH.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMEad.png" alt="8ZMEad.png"></p><h3 id="4-mcs："><a href="#4-mcs：" class="headerlink" title="4. mcs："></a>4. mcs：</h3><p>在vivado中，使用write_cfgmem -format mcs命令可以将bit文件转换成mcs文件，mcs文件也是ASCII格式，可以直接用文本工具打开，主要是在bin的基础上，增加了地址信息和校验信息。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMnRP.png" alt="8ZMnRP.png"></p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;配置文件后缀&quot;&gt;&lt;a href=&quot;#配置文件后缀&quot; class=&quot;headerlink&quot; title=&quot;配置文件后缀&quot;&gt;&lt;/a&gt;配置文件后缀&lt;/h2&gt;&lt;h3 id=&quot;1-bit：&quot;&gt;&lt;a href=&quot;#1-bit：&quot; class=&quot;headerlink&quot; titl
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Ubuntu 18.04 LTS 命令行安装中文支持</title>
+    <link href="https://www.cdutcl.com/2020/03/09/linux-ubuntu-cn/"/>
+    <id>https://www.cdutcl.com/2020/03/09/linux-ubuntu-cn/</id>
+    <published>2020-03-09T10:59:58.000Z</published>
+    <updated>2020-03-12T04:33:06.403Z</updated>
+    
+    <content type="html"><![CDATA[<p>原文链接：<a href="https://blog.csdn.net/AsynSpace/article/details/86293500" target="_blank" rel="noopener">https://blog.csdn.net/AsynSpace/article/details/86293500</a></p><p>安装之前，执行</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$LANG</span></span><br></pre></td></tr></table></figure><p>查看语言环境  </p><p>安装中文语言包：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install  language-pack-zh-han*</span><br></pre></td></tr></table></figure><p>修改配置文件：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/default/locale</span><br></pre></td></tr></table></figure><p>将原始内容注释或删除掉，替换为如下内容：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">LANG=<span class="string">"zh_CN.UTF-8"</span></span><br><span class="line">LANGUAGE=<span class="string">"zh_CN:zh"</span></span><br><span class="line">LC_NUMERIC=<span class="string">"zh_CN"</span></span><br><span class="line">LC_TIME=<span class="string">"zh_CN"</span></span><br><span class="line">LC_MONETARY=<span class="string">"zh_CN"</span></span><br><span class="line">LC_PAPER=<span class="string">"zh_CN"</span></span><br><span class="line">LC_NAME=<span class="string">"zh_CN"</span></span><br><span class="line">LC_ADDRESS=<span class="string">"zh_CN"</span></span><br><span class="line">LC_TELEPHONE=<span class="string">"zh_CN"</span></span><br><span class="line">LC_MEASUREMENT=<span class="string">"zh_CN"</span></span><br><span class="line">LC_IDENTIFICATION=<span class="string">"zh_CN"</span></span><br><span class="line">LC_ALL=<span class="string">"zh_CN.UTF-8"</span></span><br></pre></td></tr></table></figure><p>修改环境文件：  </p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/environment</span><br></pre></td></tr></table></figure><p>不修改原有内容，直接在原有内容下面添加内容：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">LANG=<span class="string">"zh_CN.UTF-8"</span></span><br><span class="line">LANGUAGE=<span class="string">"zh_CN:zh"</span></span><br><span class="line">LC_NUMERIC=<span class="string">"zh_CN"</span></span><br><span class="line">LC_TIME=<span class="string">"zh_CN"</span></span><br><span class="line">LC_MONETARY=<span class="string">"zh_CN"</span></span><br><span class="line">LC_PAPER=<span class="string">"zh_CN"</span></span><br><span class="line">LC_NAME=<span class="string">"zh_CN"</span></span><br><span class="line">LC_ADDRESS=<span class="string">"zh_CN"</span></span><br><span class="line">LC_TELEPHONE=<span class="string">"zh_CN"</span></span><br><span class="line">LC_MEASUREMENT=<span class="string">"zh_CN"</span></span><br><span class="line">LC_IDENTIFICATION=<span class="string">"zh_CN"</span></span><br><span class="line">LC_ALL=<span class="string">"zh_CN.UTF-8"</span></span><br></pre></td></tr></table></figure><p>重启</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reboot</span><br></pre></td></tr></table></figure><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;原文链接：&lt;a href=&quot;https://blog.csdn.net/AsynSpace/article/details/86293500&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://blog.csdn.net/AsynSpace/ar
+      
+    
+    </summary>
+    
+    
+      <category term="LINUX" scheme="https://www.cdutcl.com/categories/LINUX/"/>
+    
+    
+      <category term="LINUX" scheme="https://www.cdutcl.com/tags/LINUX/"/>
+    
+      <category term="Ubuntu" scheme="https://www.cdutcl.com/tags/Ubuntu/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Zynq外设之--地址空间</title>
+    <link href="https://www.cdutcl.com/2020/03/09/xilinx-zynq-address/"/>
+    <id>https://www.cdutcl.com/2020/03/09/xilinx-zynq-address/</id>
+    <published>2020-03-09T08:50:31.000Z</published>
+    <updated>2020-03-12T04:35:16.803Z</updated>
+    
+    <content type="html"><![CDATA[<p>Zynq系列器件，系统空间分布如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1soQ.png" alt="8Z1soQ.png"></p><p>其中，PS端的IO外设挂在32位APB总线下，地址分布如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1rdg.png" alt="8Z1rdg.png"></p><p>SMC地址空间如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z10L8.png" alt="8Z10L8.png"></p><p>PS系统空间分布如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1wsf.png" alt="8Z1wsf.png"></p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Zynq系列器件，系统空间分布如下：&lt;br&gt;&lt;img src=&quot;https://s1.ax1x.com/2020/03/12/8Z1soQ.png&quot; alt=&quot;8Z1soQ.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;其中，PS端的IO外设挂在32位APB总线下，地址分布如下：&lt;br&gt;&lt;im
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+      <category term="ZYNQ" scheme="https://www.cdutcl.com/tags/ZYNQ/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Zynq外设之--GPIO</title>
+    <link href="https://www.cdutcl.com/2020/03/09/xilinx-zynq-gpio/"/>
+    <id>https://www.cdutcl.com/2020/03/09/xilinx-zynq-gpio/</id>
+    <published>2020-03-09T07:02:40.000Z</published>
+    <updated>2020-03-12T04:36:32.199Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文内容主要来自官方手册ug585，根据个人理解整理成文。</p><hr><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Zynq的GPIO外设可以控制54个MIO，以及通过EMIO和PL交互的64个input、128个output。然后，这些IO分别分配到了4个BANK的GPIO控制器上。每个IO可以相互独立的配置为input、output、中断。</p><h2 id="框图"><a href="#框图" class="headerlink" title="框图"></a>框图</h2><p><img src="https://s1.ax1x.com/2020/03/12/8Z1WQ0.png" alt="8Z1WQ0.png"></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Bank0:  MIO[31:0]</span><br><span class="line">Bank1:  MIO[53:32]</span><br><span class="line">Bank2:  EMIO[31:0]</span><br><span class="line">Bank3:  EMIO[63:32]</span><br></pre></td></tr></table></figure><h2 id="功能描述"><a href="#功能描述" class="headerlink" title="功能描述"></a>功能描述</h2><p>下面是一个GPIO通道的功能框图：<br><img src="https://s1.ax1x.com/2020/03/12/8Z12zq.png" alt="8Z12zq.png"></p><h2 id="例外情况"><a href="#例外情况" class="headerlink" title="例外情况"></a>例外情况</h2><p>MIO[8:7]：这两个脚是用来表示BANK电压的。</p><h2 id="系统功能"><a href="#系统功能" class="headerlink" title="系统功能"></a>系统功能</h2><ul><li>GPIO外设的中断号是52</li><li>时钟采用CPU_1x</li></ul><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;本文内容主要来自官方手册ug585，根据个人理解整理成文。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;简介&quot;&gt;&lt;a href=&quot;#简介&quot; class=&quot;headerlink&quot; title=&quot;简介&quot;&gt;&lt;/a&gt;简介&lt;/h2&gt;&lt;p&gt;Zynq的GPIO外设可以控制54个MIO，以及通过EM
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+      <category term="ZYNQ" scheme="https://www.cdutcl.com/tags/ZYNQ/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>常用电平标准汇总(TTL/LVTTL/CMOS/LVCOMS)</title>
+    <link href="https://www.cdutcl.com/2020/03/06/hardware-level/"/>
+    <id>https://www.cdutcl.com/2020/03/06/hardware-level/</id>
+    <published>2020-03-06T10:23:26.000Z</published>
+    <updated>2020-03-12T04:54:52.292Z</updated>
+    
+    <content type="html"><![CDATA[<p>汇总常用电平标准。  </p><hr><h2 id="1-TTL"><a href="#1-TTL" class="headerlink" title="1. TTL"></a>1. TTL</h2><p>TTL(Transistor-Transistor Logic)三极管结构。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">VCC: 5V</span><br><span class="line">VOH: &gt;&#x3D;2.4V     VIH: &gt;&#x3D;2.0V</span><br><span class="line">VOL: &lt;&#x3D;0.5V     VIL: &lt;&#x3D;0.8V</span><br></pre></td></tr></table></figure><hr><h2 id="2-LVTTL"><a href="#2-LVTTL" class="headerlink" title="2. LVTTL"></a>2. LVTTL</h2><p>LVTTL(Low-Voltage TTL)</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">3.3V LVTTL:     VCC: 3.3V</span><br><span class="line">VOH: &gt;&#x3D;2.4V     VIH: &gt;&#x3D;2.0V</span><br><span class="line">VOL: &lt;&#x3D;0.4V     VIL: &lt;&#x3D;0.8V</span><br><span class="line">  </span><br><span class="line">2.5V LVTTL:     VCC: 2.5V</span><br><span class="line">VOH: &gt;&#x3D;2.0V     VIH: &gt;&#x3D;1.7V</span><br><span class="line">VOL: &lt;&#x3D;0.2V     VIL: &lt;&#x3D;0.7V</span><br></pre></td></tr></table></figure><hr><h2 id="3-CMOS"><a href="#3-CMOS" class="headerlink" title="3. CMOS"></a>3. CMOS</h2><p>CMOS(Complementary Metal Oxide Semiconductor)互补金属氧化物半导体</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">VCC: 5V</span><br><span class="line">VOH: &gt;&#x3D;4.45V    VIH: &gt;&#x3D;3.5V</span><br><span class="line">VOL: &lt;&#x3D;0.5V     VIL: &lt;&#x3D;1.5V</span><br></pre></td></tr></table></figure><hr><h2 id="4-LVCMOS"><a href="#4-LVCMOS" class="headerlink" title="4. LVCMOS"></a>4. LVCMOS</h2><p>LVCMOS(Low-Voltage CMOS)</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">3.3V LVCMOS:     VCC: 3.3V</span><br><span class="line">VOH: &gt;&#x3D;3.2V     VIH: &gt;&#x3D;2.0V</span><br><span class="line">VOL: &lt;&#x3D;0.1V     VIL: &lt;&#x3D;0.7V</span><br><span class="line"></span><br><span class="line">2.5V LVCMOS:     VCC: 2.5V</span><br><span class="line">VOH: &gt;&#x3D;2.0V     VIH: &gt;&#x3D;1.7V</span><br><span class="line">VOL: &lt;&#x3D;0.1V     VIL: &lt;&#x3D;0.7V</span><br></pre></td></tr></table></figure><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;汇总常用电平标准。  &lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;1-TTL&quot;&gt;&lt;a href=&quot;#1-TTL&quot; class=&quot;headerlink&quot; title=&quot;1. TTL&quot;&gt;&lt;/a&gt;1. TTL&lt;/h2&gt;&lt;p&gt;TTL(Transistor-Transistor Logic)
+      
+    
+    </summary>
+    
+    
+      <category term="HARDWARE" scheme="https://www.cdutcl.com/categories/HARDWARE/"/>
+    
+    
+      <category term="HARDWARE" scheme="https://www.cdutcl.com/tags/HARDWARE/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>patch命令用法</title>
+    <link href="https://www.cdutcl.com/2020/03/04/linux-patch-command/"/>
+    <id>https://www.cdutcl.com/2020/03/04/linux-patch-command/</id>
+    <published>2020-03-04T02:06:05.000Z</published>
+    <updated>2020-03-12T04:31:55.705Z</updated>
+    
+    <content type="html"><![CDATA[<p>要使用patch命令，先来看一下怎么用diff命令生成patch文件：  </p><h2 id="diff命令"><a href="#diff命令" class="headerlink" title="diff命令"></a>diff命令</h2><p>diff命令用于查找两个文件或者两个文件夹的差异，可以用这个命令来生成patch补丁文件。  </p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ diff [选项] [源文件(夹)] [目的文件(夹)]</span><br><span class="line">  </span><br><span class="line">-r 递归处理，包括子文件夹及文件；</span><br><span class="line">-N 将缺席的文件视为空文件；</span><br><span class="line">-u 输出更详细的文件内容，生成patch要使用该参数，不然生成的patch不识别；</span><br></pre></td></tr></table></figure><p>比如我有a.txt和b.txt两个文件，内容如下：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ vi a.txt</span><br><span class="line"><span class="comment"># this is a file.</span></span><br><span class="line">hello a.</span><br><span class="line"></span><br><span class="line">$ vi b.txt</span><br><span class="line"><span class="comment"># this is b file.</span></span><br><span class="line">hello b.</span><br></pre></td></tr></table></figure><p>我直接用diff命令生成的差异如下：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">$ diff a.txt b.txt</span><br><span class="line">1,2c1,2</span><br><span class="line">&lt; <span class="comment"># this is a file.</span></span><br><span class="line">&lt; hello a.</span><br><span class="line">---</span><br><span class="line">&gt; <span class="comment"># this is b file.</span></span><br><span class="line">&gt; hello b.</span><br><span class="line"></span><br><span class="line">~~~~~~~~~~~~~~</span><br><span class="line"></span><br><span class="line">$ diff -uN a.txt b.txt</span><br><span class="line">--- a.txt2020-03-04 10:31:12.716144886 +0800</span><br><span class="line">+++ b.txt2020-03-04 10:31:26.711730177 +0800</span><br><span class="line">@@ -1,2 +1,2 @@</span><br><span class="line">-<span class="comment"># this is a file.</span></span><br><span class="line">-hello a.</span><br><span class="line">+<span class="comment"># this is b file.</span></span><br><span class="line">+hello b.</span><br></pre></td></tr></table></figure><p>从上面可以看出，如果不用-u参数，生成出来的内容不是patch格式。另外注意，如果是对比两个文件夹，记得用r参数。</p><h2 id="patch命令"><a href="#patch命令" class="headerlink" title="patch命令"></a>patch命令</h2><p>利用上面的diff命令，可以生成patch补丁文件；那patch命令，就是使用补丁文件的命令：  </p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ patch -pNUM &lt;patch_file&gt;</span><br><span class="line"></span><br><span class="line">-pNUM NUM用于指定忽略几层文件；</span><br><span class="line">-E 选项用于，是否保留空文件；</span><br><span class="line">-R 取消打过补丁的内容；</span><br></pre></td></tr></table></figure><p>-p后面的数字，是表示忽略几层路径，例如：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">--- a/dir1/dir2/file.txt2020-03-04 10:31:12.716144886 +0800</span><br><span class="line">+++ b/dir1/dir2/file.txt2020-03-04 10:31:26.711730177 +0800</span><br></pre></td></tr></table></figure><p>如果你当前路径在和a、b文件夹同级，你需要对a文件夹里面内容做patch，那么-p后面的数字应该是0；如果你进入a文件夹了，就需要忽略patch里面一个层级，那么-p后面数字应该是1；如果你进入a/dir1了，那么-p后面数字应该是2；以此类推。</p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;要使用patch命令，先来看一下怎么用diff命令生成patch文件：  &lt;/p&gt;
+&lt;h2 id=&quot;diff命令&quot;&gt;&lt;a href=&quot;#diff命令&quot; class=&quot;headerlink&quot; title=&quot;diff命令&quot;&gt;&lt;/a&gt;diff命令&lt;/h2&gt;&lt;p&gt;diff命令用于查
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>(Xilinx-7系列) LVDS供电</title>
+    <link href="https://www.cdutcl.com/2020/03/03/xilinx-7series-lvds/"/>
+    <id>https://www.cdutcl.com/2020/03/03/xilinx-7series-lvds/</id>
+    <published>2020-03-03T11:33:36.000Z</published>
+    <updated>2020-03-12T04:25:29.780Z</updated>
+    
+    <content type="html"><![CDATA[<p>7系列IOBANK供电和LVDS电平规则。官方链接：<a href="https://www.xilinx.com/support/answers/43989.html" target="_blank" rel="noopener">AR#43989</a>  </p><hr><p>Checklist：<br><img src="https://www.xilinx.com/Image/hp_checklist_201409230904113294.PNG" alt="HPbank"><br><img src="https://www.xilinx.com/Image/hr_checklist_201409230904405649.PNG" alt="HRbank">    </p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;7系列IOBANK供电和LVDS电平规则。官方链接：&lt;a href=&quot;https://www.xilinx.com/support/answers/43989.html&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;AR#43989&lt;/a&gt;  &lt;/p&gt;
+&lt;
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Zynq电源设计注意事项</title>
+    <link href="https://www.cdutcl.com/2020/03/03/xilinx-zynq-powerdesgin/"/>
+    <id>https://www.cdutcl.com/2020/03/03/xilinx-zynq-powerdesgin/</id>
+    <published>2020-03-03T11:13:26.000Z</published>
+    <updated>2020-03-12T04:37:23.728Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文内容主要来自Xilinx官方手册ds191，描述在使用Xilinx Zynq芯片时，电源设计需要考虑的地方。    </p><hr><h2 id="1-背景介绍"><a href="#1-背景介绍" class="headerlink" title="1. 背景介绍"></a>1. 背景介绍</h2><p>Xilinx Zynq系列芯片，分为PS和PL两个大的部分，他们电源分别独立。所以供电时可以单独考虑。</p><h2 id="2-电源汇总"><a href="#2-电源汇总" class="headerlink" title="2. 电源汇总"></a>2. 电源汇总</h2><h3 id="2-1-PS部分需要供电如下："><a href="#2-1-PS部分需要供电如下：" class="headerlink" title="2.1 PS部分需要供电如下："></a>2.1 PS部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">VCCPINT:  1.0V  </span><br><span class="line">VCCPAUX:  1.8V  </span><br><span class="line">VCCPLL:   1.8V  </span><br><span class="line">VCCO_DDR: 1.14V~1.89V  </span><br><span class="line">VCCO_MIO: 1.71V~3.465V</span><br></pre></td></tr></table></figure><h3 id="2-2-PL部分需要供电如下："><a href="#2-2-PL部分需要供电如下：" class="headerlink" title="2.2 PL部分需要供电如下："></a>2.2 PL部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">VCCINT:   1.0V  </span><br><span class="line">VCCBRAM:  1.0V  </span><br><span class="line">VCCAUX:   1.8V  </span><br><span class="line">VCCO:     1.14V~3.465V(HR)  1.14V~1.89V(HP)  </span><br><span class="line">VCCAUX_IO: 1.8V&#x2F;2.0V</span><br></pre></td></tr></table></figure><h3 id="2-3-GT部分需要供电如下："><a href="#2-3-GT部分需要供电如下：" class="headerlink" title="2.3 GT部分需要供电如下："></a>2.3 GT部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">VMGTAVCC: 1.0V(&lt;&#x3D;10.3125GHz) 1.05V(&gt;10.3125GHz) </span><br><span class="line">VMGTAVTT: 1.2V  </span><br><span class="line">VMGTVCCAUX: 1.8V</span><br><span class="line">VMGTAVTTRCAL: 1.2V</span><br></pre></td></tr></table></figure><h3 id="2-4-XADC部分需要供电如下："><a href="#2-4-XADC部分需要供电如下：" class="headerlink" title="2.4 XADC部分需要供电如下："></a>2.4 XADC部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">VCCADC:   1.8V</span><br><span class="line">VREFP:    1.25V</span><br></pre></td></tr></table></figure><h2 id="3-上下电时序"><a href="#3-上下电时序" class="headerlink" title="3. 上下电时序"></a>3. 上下电时序</h2><h3 id="3-1-PS部分上下电时序"><a href="#3-1-PS部分上下电时序" class="headerlink" title="3.1 PS部分上下电时序"></a>3.1 PS部分上下电时序</h3><p>上电：VCCPINT -&gt; VCCPAUX &amp; VCCPLL -&gt; VCCO(MIO0,MIO1,DDR)<br>下电：和上面相反。  </p><h3 id="3-2-PL部分上下电时序"><a href="#3-2-PL部分上下电时序" class="headerlink" title="3.2 PL部分上下电时序"></a>3.2 PL部分上下电时序</h3><p>上电：VCCINT -&gt; VCCBRAM -&gt; VCCAUX -&gt; VCCAUX_IO -&gt; VCCO<br>下电：和上面相反。   </p><h2 id="4-电源斜坡"><a href="#4-电源斜坡" class="headerlink" title="4. 电源斜坡"></a>4. 电源斜坡</h2><p>所有的电源斜坡：0.2ms ~ 50ms</p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;本文内容主要来自Xilinx官方手册ds191，描述在使用Xilinx Zynq芯片时，电源设计需要考虑的地方。    &lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;1-背景介绍&quot;&gt;&lt;a href=&quot;#1-背景介绍&quot; class=&quot;headerlink&quot; title=&quot;1. 背景介绍
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+      <category term="ZYNQ" scheme="https://www.cdutcl.com/tags/ZYNQ/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>EBAZ4205 Uboot移植（问题1）</title>
+    <link href="https://www.cdutcl.com/2020/03/02/ebaz4205-ubooterr1/"/>
+    <id>https://www.cdutcl.com/2020/03/02/ebaz4205-ubooterr1/</id>
+    <published>2020-03-02T03:07:41.000Z</published>
+    <updated>2020-03-12T04:56:42.065Z</updated>
+    
+    <content type="html"><![CDATA[<p>在网上找寻Zynq移植Linux的教程，大部分都是基于Xilinx官方步骤，采用petalinux那一套，为了搞清楚具体步骤，我采用了传统的一步一步的方式移植uboot。</p><p><img src="https://s1.ax1x.com/2020/03/12/8Z3STe.jpg" alt="8Z3STe.jpg"></p><h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>编译好uboot后，用u-boot合并fsbl生成BOOT.bin，放入SD卡启动，出现了如下错误：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">No valid device tree binary found - please append one to U-Boot binary, use u-boot-dtb.bin or define CONFIG_OF_EMBED. For sandbox, use -d &lt;file.dtb&gt;</span><br><span class="line">initcall sequence 0405c19c failed at call 04052568 (err=-1)</span><br><span class="line"><span class="comment">### ERROR ### Please RESET the board ###</span></span><br></pre></td></tr></table></figure><p>大概意思就是device tree没有包含在uboot中，网上找到<a href="https://git.rigado.com/vesta/u-boot-2015.04/commit/bbb0b128c3956ac549471addc314702fbe0ace63?_ga=2.107636993.2025790433.1582948864-872288369.1582857663" target="_blank" rel="noopener">一个说明</a>：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">This new option allows U-Boot to embed a binary device tree into its image</span><br><span class="line">to allow run-time control of peripherals. This device tree is <span class="keyword">for</span> U-Boot<span class="string">'s</span></span><br><span class="line"><span class="string">own use and is not necessarily the same one as is passed to the kernel.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">The device tree compiler output should be placed in the $(obj)</span></span><br><span class="line"><span class="string">rooted tree. Since $(OBJCOPY) insists on adding the path to the</span></span><br><span class="line"><span class="string">generated symbol names, to ensure consistency it should be</span></span><br><span class="line"><span class="string">invoked from the directory where the .dtb file is located and</span></span><br><span class="line"><span class="string">given the input file name without the path.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">This commit contains my entry for the ugliest Makefile / shell interaction</span></span><br><span class="line"><span class="string">competition.</span></span><br><span class="line"><span class="string">Signed-off-by: default avatarSimon Glass &lt;sjg@chromium.org&gt;</span></span><br></pre></td></tr></table></figure><p>于是在defconfig中增加:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CONFIG_OF_EMBED=y</span><br></pre></td></tr></table></figure><p>然后报错就没有了。</p><hr><p>以上问题是在uboot2018.07版本上解决的，后面换了xilinx最新的uboot，采用该方法后，在uboot编译完成后，出现了如下提示：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">===================== WARNING ======================</span><br><span class="line">CONFIG_OF_EMBED is enabled. This option should only</span><br><span class="line">be used <span class="keyword">for</span> debugging purposes. Please use</span><br><span class="line">CONFIG_OF_SEPARATE <span class="keyword">for</span> boards <span class="keyword">in</span> mainline.</span><br><span class="line">See doc/README.fdt-control <span class="keyword">for</span> more info.</span><br><span class="line">====================================================</span><br></pre></td></tr></table></figure><p>Warning建议别把dtb嵌入到uboot中，我这次就先将就这么用，至于dtb不合并在uboot中，我就不会了，后面有时间再学了。</p><hr><p><strong>2020-3-2更新</strong><br>后面再网上找的一篇文章：<a href="https://blog.csdn.net/weixin_43048906/article/details/102527494" target="_blank" rel="noopener">https://blog.csdn.net/weixin_43048906/article/details/102527494</a><br>原来xilinx最新的源码包中，已经能够自动生成u-boot.elf文件了，并且该elf文件中，包含了dtb数据。<br>也就是说，不需要在defconfig中增加:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CONFIG_OF_EMBED=y</span><br></pre></td></tr></table></figure><p>直接用生成文件中的u-boot.elf即可。</p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;在网上找寻Zynq移植Linux的教程，大部分都是基于Xilinx官方步骤，采用petalinux那一套，为了搞清楚具体步骤，我采用了传统的一步一步的方式移植uboot。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://s1.ax1x.com/2020/03/12/8Z3
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+      <category term="EBAZ4205" scheme="https://www.cdutcl.com/categories/XILINX/EBAZ4205/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+      <category term="ZYNQ" scheme="https://www.cdutcl.com/tags/ZYNQ/"/>
+    
+      <category term="EBAZ4205" scheme="https://www.cdutcl.com/tags/EBAZ4205/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>EBAZ4205 Uboot移植过程</title>
+    <link href="https://www.cdutcl.com/2020/02/28/ebaz4205-uboot/"/>
+    <id>https://www.cdutcl.com/2020/02/28/ebaz4205-uboot/</id>
+    <published>2020-02-28T00:43:00.000Z</published>
+    <updated>2020-03-12T04:56:36.046Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文主要介绍如何移植uboot到EBAZ4205板子上去。由于EBAZ4205是个野板子，资料例程都很少，经过在网上不停搜寻，终于在网友hhuysqt的博客上，找到了例程，非常感谢hhuysqt提供的<a href="https://hhuysqt.github.io/zynq2/" target="_blank" rel="noopener">文章</a>。</p><hr><h2 id="1-环境初始化"><a href="#1-环境初始化" class="headerlink" title="1. 环境初始化"></a>1. 环境初始化</h2><p>首先通过VM虚拟机安装ubuntu16.04，安装步骤网上有很多，不想去搜的可以参考<a href="https://www.jianshu.com/p/faf8bbbdd0f2" target="_blank" rel="noopener">这里</a>。</p><p>安装好ubuntu操作系统后，接着安装xilinx的petalinux，关于petalinux的安装，可以直接参考xilinx官方文档ug1144，里面详细描述了如何安装，这里也不再累述了。我把petalinux安装在下面的路径里了：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">/opt/pkg/petalinux/2018.3/</span><br><span class="line">```  </span><br><span class="line">  </span><br><span class="line">---</span><br><span class="line"><span class="comment">## 2. 下载uboot源码</span></span><br><span class="line">Xilinx官方提供了uboot源码，可以在github上面下载：  </span><br><span class="line">[https://github.com/Xilinx/u-boot-xlnx](https://github.com/Xilinx/u-boot-xlnx)  </span><br><span class="line">**这里提示一下：**由于github在国内访问很慢，<span class="built_in">clone</span>的方式可能会中断，建议直接下载压缩包。</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"><span class="comment">## 3. 生成Vivado工程</span></span><br><span class="line">基于ebaz4205板子搭建基本的vivado工程，具体过程可以参考这篇文章：  </span><br><span class="line">[https://hhuysqt.github.io/zynq1/](https://hhuysqt.github.io/zynq1/)  </span><br><span class="line">    </span><br><span class="line">搭建好工程以后，导出hdf并新建sdk工程，然后生成fsbl代码；</span><br><span class="line">    </span><br><span class="line">---</span><br><span class="line"><span class="comment">## 4. 生成设备树</span></span><br><span class="line">关于生成设备树，好像linux里面有比较方便的方式，这里我们采用SDK的方式：  </span><br><span class="line">- 首先下载设备树库文件，方法和上面下载uboot源码类似  </span><br><span class="line">    [https://github.com/Xilinx/device-tree-xlnx](https://github.com/Xilinx/device-tree-xlnx)  </span><br><span class="line">  </span><br><span class="line">- 解压下载的设备树库，然后在SDK工程中，添加这个库路径： Xilinx -&gt; Repositories </span><br><span class="line">![repo](https://xlnx.i.lithium.com/t5/image/serverpage/image-id/54730i0DD1C75B0E87E1B8/image-size/large?v=1.0&amp;px=999)  </span><br><span class="line">  </span><br><span class="line">- 然后用新建BSP的方式，新建一个该工程的设备树：File -&gt; New -&gt; Board Support Package  </span><br><span class="line">![new repo](https://xlnx.i.lithium.com/t5/image/serverpage/image-id/54731i8E31FFF7A9540097/image-size/large?v=1.0&amp;px=999)  </span><br><span class="line">  </span><br><span class="line">建立好上述工程后，在sdk路径下，就会生成一个device-tree的文件夹，然后将该文件夹拷贝到linux中，通过下面的命令即可编译出dtb文件：</span><br><span class="line">```bash</span><br><span class="line">dtc -I dts -O dtb -o system.dtb system-top.dts</span><br></pre></td></tr></table></figure><p><strong>特别提醒</strong><br>如果直接采用默认方式生成的设备树，启动uboot后网口没法用，从log可以看出是网口没有配置，于是参照zc702的设备树，在工程生成的dts中，添加了如下配置：</p><pre><code class="bash">&amp;gem0 {     status = <span class="string">"okay"</span>;     phy-mode = <span class="string">"rgmii-id"</span>;     phy-handle = &lt;&amp;ethernet_phy&gt;;     <span class="built_in">local</span>-mac-address = [00 0a 35 00 00 00];     ethernet_phy: ethernet-phy@0 {         reg = &lt;0&gt;;         device_type = <span class="string">"ethernet-phy"</span>;     };};</code></pre><p>然后，重新生成dtb文件，后面基于该dtb文件生成的uboot即可成功使用网络。</p><hr><h2 id="4-编译uboot"><a href="#4-编译uboot" class="headerlink" title="4. 编译uboot"></a>4. 编译uboot</h2><p>解压源码，进入源码目录:  </p><pre><code class="bash">$ <span class="built_in">cd</span> u-boot-xlnx-xilinx-v2019.2  </code></pre><p>复制一份defconfig文件，这里我们基于zc702的配置来：</p><pre><code class="bash">$ cp configs/zynq_zc702_defconfig configs/zynq_ebaz4205_defconfig</code></pre><p>编辑ebaz4205的defconfig文件，并在最后增加配置：</p><pre><code class="bash">CONFIG_NAND=yCONFIG_NAND_ZYNQ=yCONFIG_OF_EMBED=y</code></pre><p>然后使用下述命令即可编译生成uboot：</p><pre><code class="bash">make zynq_ebaz4205_defconfigmake EXT_DTB=device_tree/system.dtb</code></pre><p>然后我们就可以用生成的u-boot去生成BOOT.bin了<br><strong>友情提醒</strong><br>uboot编译后会有多个文件生成，我们得用u-boot，没有后缀那个，拷贝出去生成BOOT.bin时，记得要添加elf后缀。</p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;本文主要介绍如何移植uboot到EBAZ4205板子上去。由于EBAZ4205是个野板子，资料例程都很少，经过在网上不停搜寻，终于在网友hhuysqt的博客上，找到了例程，非常感谢hhuysqt提供的&lt;a href=&quot;https://hhuysqt.github.io/zy
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+      <category term="EBAZ4205" scheme="https://www.cdutcl.com/categories/XILINX/EBAZ4205/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+      <category term="ZYNQ" scheme="https://www.cdutcl.com/tags/ZYNQ/"/>
+    
+      <category term="EBAZ4205" scheme="https://www.cdutcl.com/tags/EBAZ4205/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Git远程操作</title>
+    <link href="https://www.cdutcl.com/2020/02/27/linux-git-remote/"/>
+    <id>https://www.cdutcl.com/2020/02/27/linux-git-remote/</id>
+    <published>2020-02-27T07:16:48.000Z</published>
+    <updated>2020-03-12T04:23:08.016Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文整理总结了Git针对远程库的基本操作。<br>大部分内容参考了网上资料，然后根据自己理解整理成文。</p><hr><p>Git远程操作主要有以下几个命令：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ git remote</span><br><span class="line">$ git <span class="built_in">clone</span></span><br><span class="line">$ git pull</span><br><span class="line">$ git push</span><br><span class="line">$ git fetch</span><br></pre></td></tr></table></figure><p><img src="https://s1.ax1x.com/2020/03/12/8ZQynS.jpg" alt="8ZQynS.jpg"></p><h2 id="git-remote"><a href="#git-remote" class="headerlink" title="git remote"></a>git remote</h2><p>该命令用于设置查看远程仓库，使用方式如下。</p><p>设置远程链接</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git remote add origin https://github.com/cdutcl/ebaz4205_demo.git</span><br></pre></td></tr></table></figure><p>查看远程链接</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git remote -v</span><br><span class="line">origin  https://github.com/cdutcl/ebaz4205_demo.git (fetch)</span><br><span class="line">origin  https://github.com/cdutcl/ebaz4205_demo.git (push)</span><br></pre></td></tr></table></figure><p>删除远程链接</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git remote rm origin</span><br></pre></td></tr></table></figure><hr><h2 id="git-clone"><a href="#git-clone" class="headerlink" title="git clone"></a>git clone</h2><p>该命令用于克隆一个远程库，用了该命令后，会在本地建立一个和网上一样的库。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> https://github.com/cdutcl/ebaz4205_demo.git</span><br></pre></td></tr></table></figure><hr><h2 id="git-fetch"><a href="#git-fetch" class="headerlink" title="git fetch"></a>git fetch</h2><p>该命令会在本地新建一个origin/master分支，然后下载远程仓库到本地，但是不影响本地master分支。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ git fetch origin</span><br><span class="line">From https://github.com/cdutcl/ebaz4205_demo</span><br><span class="line"> * [new branch]      master     -&gt; origin/master</span><br><span class="line"></span><br><span class="line">$ git branch -a</span><br><span class="line">* master</span><br><span class="line">  remotes/origin/master</span><br></pre></td></tr></table></figure><p>然后根据需要自行合并到本地自己的分支上。</p><hr><h2 id="git-pull"><a href="#git-pull" class="headerlink" title="git pull"></a>git pull</h2><p>这个是直接拉取远程分支，然后合并到本地，相当于fetch+merge操作。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ git pull master:master</span><br><span class="line">remote: Enumerating objects: 5, <span class="keyword">done</span>.</span><br><span class="line">remote: Counting objects: 100% (5/5), <span class="keyword">done</span>.</span><br><span class="line">remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0</span><br><span class="line">Unpacking objects: 100% (3/3), 649 bytes | 2.00 KiB/s, <span class="keyword">done</span>.</span><br><span class="line">From https://github.com/cdutcl/ebaz4205_demo</span><br><span class="line">   07c23e7..feff746  master     -&gt; origin/master</span><br></pre></td></tr></table></figure><p>pull命令后面冒号前后分别是：&lt;远程分支名&gt;:&lt;本地分支名&gt;</p><hr><h2 id="git-push"><a href="#git-push" class="headerlink" title="git push"></a>git push</h2><p>该命令就是将本地分支推送到远程仓库。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ git push origin master</span><br><span class="line">Enumerating objects: 5, <span class="keyword">done</span>.</span><br><span class="line">Counting objects: 100% (5/5), <span class="keyword">done</span>.</span><br><span class="line">Delta compression using up to 8 threads</span><br><span class="line">Compressing objects: 100% (2/2), <span class="keyword">done</span>.</span><br><span class="line">Writing objects: 100% (3/3), 290 bytes | 48.00 KiB/s, <span class="keyword">done</span>.</span><br><span class="line">Total 3 (delta 0), reused 0 (delta 0)</span><br><span class="line">To https://github.com/cdutcl/ebaz4205_demo.git</span><br><span class="line">   feff746..c3c2834  master -&gt; master</span><br></pre></td></tr></table></figure><p>push命令后面冒号前后分别是：&lt;本地分支名&gt;:&lt;远程分支名&gt;</p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;本文整理总结了Git针对远程库的基本操作。&lt;br&gt;大部分内容参考了网上资料，然后根据自己理解整理成文。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;Git远程操作主要有以下几个命令：&lt;/p&gt;
+&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class
+      
+    
+    </summary>
+    
+    
+      <category term="LINUX" scheme="https://www.cdutcl.com/categories/LINUX/"/>
+    
+    
+      <category term="GIT" scheme="https://www.cdutcl.com/tags/GIT/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Vivado2018.1闪退问题</title>
+    <link href="https://www.cdutcl.com/2020/02/27/xilinx-vivado-err/"/>
+    <id>https://www.cdutcl.com/2020/02/27/xilinx-vivado-err/</id>
+    <published>2020-02-27T02:45:40.000Z</published>
+    <updated>2020-03-12T04:31:00.453Z</updated>
+    
+    <content type="html"><![CDATA[<p>有人在安装vivado2018.1以后，添加source后，出现闪退问题，通过上网查询，找到了解决办法。</p><hr><h2 id="官网给出了一个说明：AR-71064"><a href="#官网给出了一个说明：AR-71064" class="headerlink" title="官网给出了一个说明：AR#71064"></a>官网给出了一个说明：<a href="https://www.xilinx.com/support/answers/71064.html" target="_blank" rel="noopener">AR#71064</a></h2><p>从官方说明可以看出，这个问题可能出现在2017.1以后的版本。主要原因是srcscanner.exe这个程序的问题，2016.4以前的版本因为没有用这个程序，所以不会出问题。</p><h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><p>下载官方提供的解决补丁，解压后用管理员方式运行：<br><a href="boostSharedDirFixApp.zip">boostSharedDirFixApp.zip</a><br>运行完成后，重启电脑就行了。</p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;有人在安装vivado2018.1以后，添加source后，出现闪退问题，通过上网查询，找到了解决办法。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;官网给出了一个说明：AR-71064&quot;&gt;&lt;a href=&quot;#官网给出了一个说明：AR-71064&quot; class=&quot;headerlink
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+      <category term="VIVADO" scheme="https://www.cdutcl.com/tags/VIVADO/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>EBAZ4205 ZYNQ开发板初始化</title>
+    <link href="https://www.cdutcl.com/2020/02/27/ebaz4205-summy/"/>
+    <id>https://www.cdutcl.com/2020/02/27/ebaz4205-summy/</id>
+    <published>2020-02-27T00:10:48.000Z</published>
+    <updated>2020-03-12T04:56:18.544Z</updated>
+    
+    <content type="html"><![CDATA[<p>今天给大家介绍一个低成本的Zynq开发板：EBAZ4205</p><p>成本有多低呢？(^_^) 我买了三块，<font color=#DC143C><strong>100元包邮!</strong></font><br>而且我还是买的比较晚了，据说再早些时候更便宜。</p><hr><h2 id="1-整板概览"><a href="#1-整板概览" class="headerlink" title="1. 整板概览"></a>1. 整板概览</h2><p>我们看看这个便宜的开发板长什么样子呢？<br><img src="https://s1.ax1x.com/2020/03/12/8Z3STe.jpg" alt="8Z3STe.jpg"><br>如上图所示，主芯片采用的是Xilinx的XC7Z010-1CLG400，板子上含有的外设及接口有：<br><strong>33.33M晶振、NAND FLASH、DDR3、以太网、LED、UART插针、按键、IO插针</strong><br>板子的<strong>原理图</strong>在这里：<a href="ebaz_files/ebaz4205_sch.pdf">PDF</a></p><hr><h2 id="2-板子初始化"><a href="#2-板子初始化" class="headerlink" title="2. 板子初始化"></a>2. 板子初始化</h2><p>刚拿到板子，需要做几个初始化工作：</p><ul><li>焊接SD卡座</li><li>焊接UART插针</li><li>焊接JTAG插针</li><li>接通电源插座</li></ul><hr><h2 id="3-电源部分"><a href="#3-电源部分" class="headerlink" title="3. 电源部分"></a>3. 电源部分</h2><p>板子上J4是一个6P的电源插座，从丝印可以看出来是接12V电源，但当我供给它12V电源以后，发现板子并没有工作。经过排查后，从电路图才发现，该电源座输入的12V，有个二极管默认没有焊接：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1zwD.png" alt="8Z1zwD.png"><br>图中可以看出这里需要一个二极管，直接短接即可，我为了安全起见，把板子上D21处的二极管挪过来了：<br><img src="https://s1.ax1x.com/2020/03/12/8Z39FH.png" alt="8Z39FH.png"></p><hr><h2 id="4-环境搭建"><a href="#4-环境搭建" class="headerlink" title="4. 环境搭建"></a>4. 环境搭建</h2><p>做好上述准备工作后，接好仿真器、串口电缆，就可以给开发板通电了。<br><img src="https://s1.ax1x.com/2020/03/12/8Z3A6P.jpg" alt="8Z3A6P.jpg"></p><hr><h2 id="5-通电串口打印"><a href="#5-通电串口打印" class="headerlink" title="5. 通电串口打印"></a>5. 通电串口打印</h2><p>打开串口终端，可以看到uboot的打印了，说明板子开始工作了。<br><img src="https://s1.ax1x.com/2020/03/12/8Z1xeO.png" alt="8Z1xeO.png"></p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;今天给大家介绍一个低成本的Zynq开发板：EBAZ4205&lt;/p&gt;
+&lt;p&gt;成本有多低呢？(^_^) 我买了三块，&lt;font color=#DC143C&gt;&lt;strong&gt;100元包邮!&lt;/strong&gt;&lt;/font&gt;&lt;br&gt;而且我还是买的比较晚了，据说再早些时候更便宜。&lt;/p
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+      <category term="EBAZ4205" scheme="https://www.cdutcl.com/categories/XILINX/EBAZ4205/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+      <category term="ZYNQ" scheme="https://www.cdutcl.com/tags/ZYNQ/"/>
+    
+      <category term="EBAZ4205" scheme="https://www.cdutcl.com/tags/EBAZ4205/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Xilinx下载器驱动问题</title>
+    <link href="https://www.cdutcl.com/2020/02/26/xilinx-driver/"/>
+    <id>https://www.cdutcl.com/2020/02/26/xilinx-driver/</id>
+    <published>2020-02-26T10:52:09.000Z</published>
+    <updated>2020-03-12T04:29:51.663Z</updated>
+    
+    <content type="html"><![CDATA[<p>Win10系统下，安装多个版本Vivado后，Xilinx DLC9驱动不识别问题。</p><h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><p>刚开始，电脑上安装了Vivado2015.4和ISE14.7两个软件，使用一切正常。后续有了升级Vivado版本的需求，又在电脑上装了2017.4版本的Vivado。<br>装好了2017.4的版本后，当插上DLC9下载后，状态灯成暗红色（原来正常情况下应该亮红色），开发板通电后，DLC9的状态灯没有变化，依然是暗红色（正常应该变为绿色）。<br><img src="https://s1.ax1x.com/2020/03/12/8Zlk4A.png" alt="8Zlk4A.png"></p><p>然后打开Vivado2017.4软件，进入Hardware Manager，然后点击Auto Connect后，从系统音判断，下载器出现了几次弹出操作，然后DLC9的灯状态变成绿色了，从设备管理器看驱动状态，好像也正常了。<br><img src="https://s1.ax1x.com/2020/03/12/8ZliAH.png" alt="8ZliAH.png"></p><p>但事实上，还是扫不到器件，报错信息如下：<br><img src="https://s1.ax1x.com/2020/03/12/8ZlFNd.png" alt="8ZlFNd.png"></p><p>尝试换成ISE的impact工具来用，发现还是没法扫链：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WARNING:iMPACT:923 - Can not find cable, check cable setup !</span><br></pre></td></tr></table></figure><p><img src="https://s1.ax1x.com/2020/03/12/8ZlpnO.png" alt="8ZlpnO.png"></p><hr><h2 id="解决问题"><a href="#解决问题" class="headerlink" title="解决问题"></a>解决问题</h2><p>根据问题现象，判断问题应该是出在驱动。于是重新安装Vivado2015.4的驱动。</p><p>进入Vivado2015.4的安装路径下：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">D:\Xilinx\Vivado\2015.4\data\xicom\cable_drivers\nt64</span><br></pre></td></tr></table></figure><p>以管理员身份运行驱动安装程序：<br><img src="https://s1.ax1x.com/2020/03/12/8ZlCHe.png" alt="8ZlCHe.png"></p><p>重新安装驱动以后，再次插上DLC9下载器，灯初始状态就正常了，然后打开Vivado的Hardware Manager，也可以成功扫到器件了。<br><img src="https://s1.ax1x.com/2020/03/12/8ZlE9I.png" alt="8ZlE9I.png"></p><h2 id="问题总结"><a href="#问题总结" class="headerlink" title="问题总结"></a>问题总结</h2><p>在安装多个版本Vivado的场景下，如若下载器驱动出现问题，重新安装相应版本的驱动即可，特别注意的是：<br><font color=#DC143C>重新安装驱动时，一定要用系统管理员方式安装！！！</font></p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Win10系统下，安装多个版本Vivado后，Xilinx DLC9驱动不识别问题。&lt;/p&gt;
+&lt;h2 id=&quot;问题背景&quot;&gt;&lt;a href=&quot;#问题背景&quot; class=&quot;headerlink&quot; title=&quot;问题背景&quot;&gt;&lt;/a&gt;问题背景&lt;/h2&gt;&lt;p&gt;刚开始，电脑上安装了Vi
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+  </entry>
+  
+</feed>

@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-big-counter.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.cdutcl.com","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="FPGA">
+<meta property="og:type" content="website">
+<meta property="og:title" content="CDUTCL">
+<meta property="og:url" content="https://www.cdutcl.com/page/2/index.html">
+<meta property="og:site_name" content="CDUTCL">
+<meta property="og:description" content="FPGA">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="cdutcl">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.cdutcl.com/page/2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : true,
+    isPost : false
+  };
+</script>
+
+  <title>CDUTCL</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-159222686-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-159222686-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?9748d74509578835f8d2dea2b209dfca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="CDUTCL" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CDUTCL</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">cdutcl@gmail.com</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/cdutcl" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/2020/03/02/ebaz4205-ubooterr1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cdutcl">
+      <meta itemprop="description" content="FPGA">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CDUTCL">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/02/ebaz4205-ubooterr1/" class="post-title-link" itemprop="url">EBAZ4205 Uboot移植（问题1）</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020/03/02 11:07:41" itemprop="dateCreated datePublished" datetime="2020-03-02T11:07:41+08:00">2020/03/02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020/03/12 12:56:42" itemprop="dateModified" datetime="2020-03-12T12:56:42+08:00">2020/03/12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/EBAZ4205/" itemprop="url" rel="index"><span itemprop="name">EBAZ4205</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在网上找寻Zynq移植Linux的教程，大部分都是基于Xilinx官方步骤，采用petalinux那一套，为了搞清楚具体步骤，我采用了传统的一步一步的方式移植uboot。</p>
+<p><img src="https://s1.ax1x.com/2020/03/12/8Z3STe.jpg" alt="8Z3STe.jpg"></p>
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>编译好uboot后，用u-boot合并fsbl生成BOOT.bin，放入SD卡启动，出现了如下错误：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">No valid device tree binary found - please append one to U-Boot binary, use u-boot-dtb.bin or define CONFIG_OF_EMBED. For sandbox, use -d &lt;file.dtb&gt;</span><br><span class="line">initcall sequence 0405c19c failed at call 04052568 (err=-1)</span><br><span class="line"><span class="comment">### ERROR ### Please RESET the board ###</span></span><br></pre></td></tr></table></figure>
+
+<p>大概意思就是device tree没有包含在uboot中，网上找到<a href="https://git.rigado.com/vesta/u-boot-2015.04/commit/bbb0b128c3956ac549471addc314702fbe0ace63?_ga=2.107636993.2025790433.1582948864-872288369.1582857663" target="_blank" rel="noopener">一个说明</a>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">This new option allows U-Boot to embed a binary device tree into its image</span><br><span class="line">to allow run-time control of peripherals. This device tree is <span class="keyword">for</span> U-Boot<span class="string">'s</span></span><br><span class="line"><span class="string">own use and is not necessarily the same one as is passed to the kernel.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">The device tree compiler output should be placed in the $(obj)</span></span><br><span class="line"><span class="string">rooted tree. Since $(OBJCOPY) insists on adding the path to the</span></span><br><span class="line"><span class="string">generated symbol names, to ensure consistency it should be</span></span><br><span class="line"><span class="string">invoked from the directory where the .dtb file is located and</span></span><br><span class="line"><span class="string">given the input file name without the path.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">This commit contains my entry for the ugliest Makefile / shell interaction</span></span><br><span class="line"><span class="string">competition.</span></span><br><span class="line"><span class="string">Signed-off-by: default avatarSimon Glass &lt;sjg@chromium.org&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>于是在defconfig中增加:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CONFIG_OF_EMBED=y</span><br></pre></td></tr></table></figure>
+<p>然后报错就没有了。</p>
+<hr>
+<p>以上问题是在uboot2018.07版本上解决的，后面换了xilinx最新的uboot，采用该方法后，在uboot编译完成后，出现了如下提示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">===================== WARNING ======================</span><br><span class="line">CONFIG_OF_EMBED is enabled. This option should only</span><br><span class="line">be used <span class="keyword">for</span> debugging purposes. Please use</span><br><span class="line">CONFIG_OF_SEPARATE <span class="keyword">for</span> boards <span class="keyword">in</span> mainline.</span><br><span class="line">See doc/README.fdt-control <span class="keyword">for</span> more info.</span><br><span class="line">====================================================</span><br></pre></td></tr></table></figure>
+<p>Warning建议别把dtb嵌入到uboot中，我这次就先将就这么用，至于dtb不合并在uboot中，我就不会了，后面有时间再学了。</p>
+<hr>
+<p><strong>2020-3-2更新</strong><br>后面再网上找的一篇文章：<a href="https://blog.csdn.net/weixin_43048906/article/details/102527494" target="_blank" rel="noopener">https://blog.csdn.net/weixin_43048906/article/details/102527494</a><br>原来xilinx最新的源码包中，已经能够自动生成u-boot.elf文件了，并且该elf文件中，包含了dtb数据。<br>也就是说，不需要在defconfig中增加:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CONFIG_OF_EMBED=y</span><br></pre></td></tr></table></figure>
+<p>直接用生成文件中的u-boot.elf即可。</p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+    <div>
+      
+    </div>
+
+    <div>
+          
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/2020/02/28/ebaz4205-uboot/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cdutcl">
+      <meta itemprop="description" content="FPGA">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CDUTCL">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/28/ebaz4205-uboot/" class="post-title-link" itemprop="url">EBAZ4205 Uboot移植过程</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020/02/28 08:43:00" itemprop="dateCreated datePublished" datetime="2020-02-28T08:43:00+08:00">2020/02/28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020/03/12 12:56:36" itemprop="dateModified" datetime="2020-03-12T12:56:36+08:00">2020/03/12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/EBAZ4205/" itemprop="url" rel="index"><span itemprop="name">EBAZ4205</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>本文主要介绍如何移植uboot到EBAZ4205板子上去。由于EBAZ4205是个野板子，资料例程都很少，经过在网上不停搜寻，终于在网友hhuysqt的博客上，找到了例程，非常感谢hhuysqt提供的<a href="https://hhuysqt.github.io/zynq2/" target="_blank" rel="noopener">文章</a>。</p>
+<hr>
+<h2 id="1-环境初始化"><a href="#1-环境初始化" class="headerlink" title="1. 环境初始化"></a>1. 环境初始化</h2><p>首先通过VM虚拟机安装ubuntu16.04，安装步骤网上有很多，不想去搜的可以参考<a href="https://www.jianshu.com/p/faf8bbbdd0f2" target="_blank" rel="noopener">这里</a>。</p>
+<p>安装好ubuntu操作系统后，接着安装xilinx的petalinux，关于petalinux的安装，可以直接参考xilinx官方文档ug1144，里面详细描述了如何安装，这里也不再累述了。我把petalinux安装在下面的路径里了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">/opt/pkg/petalinux/2018.3/</span><br><span class="line">```  </span><br><span class="line">  </span><br><span class="line">---</span><br><span class="line"><span class="comment">## 2. 下载uboot源码</span></span><br><span class="line">Xilinx官方提供了uboot源码，可以在github上面下载：  </span><br><span class="line">[https://github.com/Xilinx/u-boot-xlnx](https://github.com/Xilinx/u-boot-xlnx)  </span><br><span class="line">**这里提示一下：**由于github在国内访问很慢，<span class="built_in">clone</span>的方式可能会中断，建议直接下载压缩包。</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"><span class="comment">## 3. 生成Vivado工程</span></span><br><span class="line">基于ebaz4205板子搭建基本的vivado工程，具体过程可以参考这篇文章：  </span><br><span class="line">[https://hhuysqt.github.io/zynq1/](https://hhuysqt.github.io/zynq1/)  </span><br><span class="line">    </span><br><span class="line">搭建好工程以后，导出hdf并新建sdk工程，然后生成fsbl代码；</span><br><span class="line">    </span><br><span class="line">---</span><br><span class="line"><span class="comment">## 4. 生成设备树</span></span><br><span class="line">关于生成设备树，好像linux里面有比较方便的方式，这里我们采用SDK的方式：  </span><br><span class="line">- 首先下载设备树库文件，方法和上面下载uboot源码类似  </span><br><span class="line">    [https://github.com/Xilinx/device-tree-xlnx](https://github.com/Xilinx/device-tree-xlnx)  </span><br><span class="line">  </span><br><span class="line">- 解压下载的设备树库，然后在SDK工程中，添加这个库路径： Xilinx -&gt; Repositories </span><br><span class="line">![repo](https://xlnx.i.lithium.com/t5/image/serverpage/image-id/54730i0DD1C75B0E87E1B8/image-size/large?v=1.0&amp;px=999)  </span><br><span class="line">  </span><br><span class="line">- 然后用新建BSP的方式，新建一个该工程的设备树：File -&gt; New -&gt; Board Support Package  </span><br><span class="line">![new repo](https://xlnx.i.lithium.com/t5/image/serverpage/image-id/54731i8E31FFF7A9540097/image-size/large?v=1.0&amp;px=999)  </span><br><span class="line">  </span><br><span class="line">建立好上述工程后，在sdk路径下，就会生成一个device-tree的文件夹，然后将该文件夹拷贝到linux中，通过下面的命令即可编译出dtb文件：</span><br><span class="line">```bash</span><br><span class="line">dtc -I dts -O dtb -o system.dtb system-top.dts</span><br></pre></td></tr></table></figure>
+<p><strong>特别提醒</strong><br>如果直接采用默认方式生成的设备树，启动uboot后网口没法用，从log可以看出是网口没有配置，于是参照zc702的设备树，在工程生成的dts中，添加了如下配置：</p>
+<pre><code class="bash">&amp;gem0 {
+     status = <span class="string">"okay"</span>;
+     phy-mode = <span class="string">"rgmii-id"</span>;
+     phy-handle = &lt;&amp;ethernet_phy&gt;;
+     <span class="built_in">local</span>-mac-address = [00 0a 35 00 00 00];
+     ethernet_phy: ethernet-phy@0 {
+         reg = &lt;0&gt;;
+         device_type = <span class="string">"ethernet-phy"</span>;
+     };
+};</code></pre>
+<p>然后，重新生成dtb文件，后面基于该dtb文件生成的uboot即可成功使用网络。</p>
+<hr>
+<h2 id="4-编译uboot"><a href="#4-编译uboot" class="headerlink" title="4. 编译uboot"></a>4. 编译uboot</h2><p>解压源码，进入源码目录:  </p>
+<pre><code class="bash">$ <span class="built_in">cd</span> u-boot-xlnx-xilinx-v2019.2  </code></pre>
+<p>复制一份defconfig文件，这里我们基于zc702的配置来：</p>
+<pre><code class="bash">$ cp configs/zynq_zc702_defconfig configs/zynq_ebaz4205_defconfig</code></pre>
+<p>编辑ebaz4205的defconfig文件，并在最后增加配置：</p>
+<pre><code class="bash">CONFIG_NAND=y
+CONFIG_NAND_ZYNQ=y
+CONFIG_OF_EMBED=y</code></pre>
+<p>然后使用下述命令即可编译生成uboot：</p>
+<pre><code class="bash">make zynq_ebaz4205_defconfig
+make EXT_DTB=device_tree/system.dtb</code></pre>
+<p>然后我们就可以用生成的u-boot去生成BOOT.bin了<br><strong>友情提醒</strong><br>uboot编译后会有多个文件生成，我们得用u-boot，没有后缀那个，拷贝出去生成BOOT.bin时，记得要添加elf后缀。</p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+    <div>
+      
+    </div>
+
+    <div>
+          
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/2020/02/27/linux-git-remote/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cdutcl">
+      <meta itemprop="description" content="FPGA">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CDUTCL">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/27/linux-git-remote/" class="post-title-link" itemprop="url">Git远程操作</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020/02/27 15:16:48" itemprop="dateCreated datePublished" datetime="2020-02-27T15:16:48+08:00">2020/02/27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020/03/12 12:23:08" itemprop="dateModified" datetime="2020-03-12T12:23:08+08:00">2020/03/12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/LINUX/" itemprop="url" rel="index"><span itemprop="name">LINUX</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>本文整理总结了Git针对远程库的基本操作。<br>大部分内容参考了网上资料，然后根据自己理解整理成文。</p>
+<hr>
+<p>Git远程操作主要有以下几个命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ git remote</span><br><span class="line">$ git <span class="built_in">clone</span></span><br><span class="line">$ git pull</span><br><span class="line">$ git push</span><br><span class="line">$ git fetch</span><br></pre></td></tr></table></figure>
+<p><img src="https://s1.ax1x.com/2020/03/12/8ZQynS.jpg" alt="8ZQynS.jpg"></p>
+<h2 id="git-remote"><a href="#git-remote" class="headerlink" title="git remote"></a>git remote</h2><p>该命令用于设置查看远程仓库，使用方式如下。</p>
+<p>设置远程链接</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git remote add origin https://github.com/cdutcl/ebaz4205_demo.git</span><br></pre></td></tr></table></figure>
+
+<p>查看远程链接</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git remote -v</span><br><span class="line">origin  https://github.com/cdutcl/ebaz4205_demo.git (fetch)</span><br><span class="line">origin  https://github.com/cdutcl/ebaz4205_demo.git (push)</span><br></pre></td></tr></table></figure>
+
+<p>删除远程链接</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git remote rm origin</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="git-clone"><a href="#git-clone" class="headerlink" title="git clone"></a>git clone</h2><p>该命令用于克隆一个远程库，用了该命令后，会在本地建立一个和网上一样的库。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> https://github.com/cdutcl/ebaz4205_demo.git</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="git-fetch"><a href="#git-fetch" class="headerlink" title="git fetch"></a>git fetch</h2><p>该命令会在本地新建一个origin/master分支，然后下载远程仓库到本地，但是不影响本地master分支。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ git fetch origin</span><br><span class="line">From https://github.com/cdutcl/ebaz4205_demo</span><br><span class="line"> * [new branch]      master     -&gt; origin/master</span><br><span class="line"></span><br><span class="line">$ git branch -a</span><br><span class="line">* master</span><br><span class="line">  remotes/origin/master</span><br></pre></td></tr></table></figure>
+<p>然后根据需要自行合并到本地自己的分支上。</p>
+<hr>
+<h2 id="git-pull"><a href="#git-pull" class="headerlink" title="git pull"></a>git pull</h2><p>这个是直接拉取远程分支，然后合并到本地，相当于fetch+merge操作。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ git pull master:master</span><br><span class="line">remote: Enumerating objects: 5, <span class="keyword">done</span>.</span><br><span class="line">remote: Counting objects: 100% (5/5), <span class="keyword">done</span>.</span><br><span class="line">remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0</span><br><span class="line">Unpacking objects: 100% (3/3), 649 bytes | 2.00 KiB/s, <span class="keyword">done</span>.</span><br><span class="line">From https://github.com/cdutcl/ebaz4205_demo</span><br><span class="line">   07c23e7..feff746  master     -&gt; origin/master</span><br></pre></td></tr></table></figure>
+<p>pull命令后面冒号前后分别是：&lt;远程分支名&gt;:&lt;本地分支名&gt;</p>
+<hr>
+<h2 id="git-push"><a href="#git-push" class="headerlink" title="git push"></a>git push</h2><p>该命令就是将本地分支推送到远程仓库。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ git push origin master</span><br><span class="line">Enumerating objects: 5, <span class="keyword">done</span>.</span><br><span class="line">Counting objects: 100% (5/5), <span class="keyword">done</span>.</span><br><span class="line">Delta compression using up to 8 threads</span><br><span class="line">Compressing objects: 100% (2/2), <span class="keyword">done</span>.</span><br><span class="line">Writing objects: 100% (3/3), 290 bytes | 48.00 KiB/s, <span class="keyword">done</span>.</span><br><span class="line">Total 3 (delta 0), reused 0 (delta 0)</span><br><span class="line">To https://github.com/cdutcl/ebaz4205_demo.git</span><br><span class="line">   feff746..c3c2834  master -&gt; master</span><br></pre></td></tr></table></figure>
+<p>push命令后面冒号前后分别是：&lt;本地分支名&gt;:&lt;远程分支名&gt;</p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+    <div>
+      
+    </div>
+
+    <div>
+          
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/2020/02/27/xilinx-vivado-err/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cdutcl">
+      <meta itemprop="description" content="FPGA">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CDUTCL">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/27/xilinx-vivado-err/" class="post-title-link" itemprop="url">Vivado2018.1闪退问题</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020/02/27 10:45:40" itemprop="dateCreated datePublished" datetime="2020-02-27T10:45:40+08:00">2020/02/27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020/03/12 12:31:00" itemprop="dateModified" datetime="2020-03-12T12:31:00+08:00">2020/03/12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>223</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>有人在安装vivado2018.1以后，添加source后，出现闪退问题，通过上网查询，找到了解决办法。</p>
+<hr>
+<h2 id="官网给出了一个说明：AR-71064"><a href="#官网给出了一个说明：AR-71064" class="headerlink" title="官网给出了一个说明：AR#71064"></a>官网给出了一个说明：<a href="https://www.xilinx.com/support/answers/71064.html" target="_blank" rel="noopener">AR#71064</a></h2><p>从官方说明可以看出，这个问题可能出现在2017.1以后的版本。主要原因是srcscanner.exe这个程序的问题，2016.4以前的版本因为没有用这个程序，所以不会出问题。</p>
+<h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><p>下载官方提供的解决补丁，解压后用管理员方式运行：<br><a href="boostSharedDirFixApp.zip">boostSharedDirFixApp.zip</a><br>运行完成后，重启电脑就行了。</p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+    <div>
+      
+    </div>
+
+    <div>
+          
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/2020/02/27/ebaz4205-summy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cdutcl">
+      <meta itemprop="description" content="FPGA">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CDUTCL">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/27/ebaz4205-summy/" class="post-title-link" itemprop="url">EBAZ4205 ZYNQ开发板初始化</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020/02/27 08:10:48" itemprop="dateCreated datePublished" datetime="2020-02-27T08:10:48+08:00">2020/02/27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020/03/12 12:56:18" itemprop="dateModified" datetime="2020-03-12T12:56:18+08:00">2020/03/12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/EBAZ4205/" itemprop="url" rel="index"><span itemprop="name">EBAZ4205</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>486</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>今天给大家介绍一个低成本的Zynq开发板：EBAZ4205</p>
+<p>成本有多低呢？(^_^) 我买了三块，<font color=#DC143C><strong>100元包邮!</strong></font><br>而且我还是买的比较晚了，据说再早些时候更便宜。</p>
+<hr>
+<h2 id="1-整板概览"><a href="#1-整板概览" class="headerlink" title="1. 整板概览"></a>1. 整板概览</h2><p>我们看看这个便宜的开发板长什么样子呢？<br><img src="https://s1.ax1x.com/2020/03/12/8Z3STe.jpg" alt="8Z3STe.jpg"><br>如上图所示，主芯片采用的是Xilinx的XC7Z010-1CLG400，板子上含有的外设及接口有：<br><strong>33.33M晶振、NAND FLASH、DDR3、以太网、LED、UART插针、按键、IO插针</strong><br>板子的<strong>原理图</strong>在这里：<a href="ebaz_files/ebaz4205_sch.pdf">PDF</a></p>
+<hr>
+<h2 id="2-板子初始化"><a href="#2-板子初始化" class="headerlink" title="2. 板子初始化"></a>2. 板子初始化</h2><p>刚拿到板子，需要做几个初始化工作：</p>
+<ul>
+<li>焊接SD卡座</li>
+<li>焊接UART插针</li>
+<li>焊接JTAG插针</li>
+<li>接通电源插座</li>
+</ul>
+<hr>
+<h2 id="3-电源部分"><a href="#3-电源部分" class="headerlink" title="3. 电源部分"></a>3. 电源部分</h2><p>板子上J4是一个6P的电源插座，从丝印可以看出来是接12V电源，但当我供给它12V电源以后，发现板子并没有工作。经过排查后，从电路图才发现，该电源座输入的12V，有个二极管默认没有焊接：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1zwD.png" alt="8Z1zwD.png"><br>图中可以看出这里需要一个二极管，直接短接即可，我为了安全起见，把板子上D21处的二极管挪过来了：<br><img src="https://s1.ax1x.com/2020/03/12/8Z39FH.png" alt="8Z39FH.png"></p>
+<hr>
+<h2 id="4-环境搭建"><a href="#4-环境搭建" class="headerlink" title="4. 环境搭建"></a>4. 环境搭建</h2><p>做好上述准备工作后，接好仿真器、串口电缆，就可以给开发板通电了。<br><img src="https://s1.ax1x.com/2020/03/12/8Z3A6P.jpg" alt="8Z3A6P.jpg"></p>
+<hr>
+<h2 id="5-通电串口打印"><a href="#5-通电串口打印" class="headerlink" title="5. 通电串口打印"></a>5. 通电串口打印</h2><p>打开串口终端，可以看到uboot的打印了，说明板子开始工作了。<br><img src="https://s1.ax1x.com/2020/03/12/8Z1xeO.png" alt="8Z1xeO.png"></p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+    <div>
+      
+    </div>
+
+    <div>
+          
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/2020/02/26/xilinx-driver/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cdutcl">
+      <meta itemprop="description" content="FPGA">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CDUTCL">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/26/xilinx-driver/" class="post-title-link" itemprop="url">Xilinx下载器驱动问题</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020/02/26 18:52:09" itemprop="dateCreated datePublished" datetime="2020-02-26T18:52:09+08:00">2020/02/26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020/03/12 12:29:51" itemprop="dateModified" datetime="2020-03-12T12:29:51+08:00">2020/03/12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>704</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Win10系统下，安装多个版本Vivado后，Xilinx DLC9驱动不识别问题。</p>
+<h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><p>刚开始，电脑上安装了Vivado2015.4和ISE14.7两个软件，使用一切正常。后续有了升级Vivado版本的需求，又在电脑上装了2017.4版本的Vivado。<br>装好了2017.4的版本后，当插上DLC9下载后，状态灯成暗红色（原来正常情况下应该亮红色），开发板通电后，DLC9的状态灯没有变化，依然是暗红色（正常应该变为绿色）。<br><img src="https://s1.ax1x.com/2020/03/12/8Zlk4A.png" alt="8Zlk4A.png"></p>
+<p>然后打开Vivado2017.4软件，进入Hardware Manager，然后点击Auto Connect后，从系统音判断，下载器出现了几次弹出操作，然后DLC9的灯状态变成绿色了，从设备管理器看驱动状态，好像也正常了。<br><img src="https://s1.ax1x.com/2020/03/12/8ZliAH.png" alt="8ZliAH.png"></p>
+<p>但事实上，还是扫不到器件，报错信息如下：<br><img src="https://s1.ax1x.com/2020/03/12/8ZlFNd.png" alt="8ZlFNd.png"></p>
+<p>尝试换成ISE的impact工具来用，发现还是没法扫链：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WARNING:iMPACT:923 - Can not find cable, check cable setup !</span><br></pre></td></tr></table></figure>
+<p><img src="https://s1.ax1x.com/2020/03/12/8ZlpnO.png" alt="8ZlpnO.png"></p>
+<hr>
+<h2 id="解决问题"><a href="#解决问题" class="headerlink" title="解决问题"></a>解决问题</h2><p>根据问题现象，判断问题应该是出在驱动。于是重新安装Vivado2015.4的驱动。</p>
+<p>进入Vivado2015.4的安装路径下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">D:\Xilinx\Vivado\2015.4\data\xicom\cable_drivers\nt64</span><br></pre></td></tr></table></figure>
+
+<p>以管理员身份运行驱动安装程序：<br><img src="https://s1.ax1x.com/2020/03/12/8ZlCHe.png" alt="8ZlCHe.png"></p>
+<p>重新安装驱动以后，再次插上DLC9下载器，灯初始状态就正常了，然后打开Vivado的Hardware Manager，也可以成功扫到器件了。<br><img src="https://s1.ax1x.com/2020/03/12/8ZlE9I.png" alt="8ZlE9I.png"></p>
+<h2 id="问题总结"><a href="#问题总结" class="headerlink" title="问题总结"></a>问题总结</h2><p>在安装多个版本Vivado的场景下，如若下载器驱动出现问题，重新安装相应版本的驱动即可，特别注意的是：<br><font color=#DC143C>重新安装驱动时，一定要用系统管理员方式安装！！！</font></p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+    <div>
+      
+    </div>
+
+    <div>
+          
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+  </div>
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">cdutcl</p>
+  <div class="site-description" itemprop="description">FPGA</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:cdutcl@gmail.com" title="E-Mail → mailto:cdutcl@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/cdutcl" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;cdutcl" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2011 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">cdutcl</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">NaNm</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">NaN:aN</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+</body>
+</html>

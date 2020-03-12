@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.cdutcl.com/"/>
-  <updated>2020-03-12T08:58:41.686Z</updated>
+  <updated>2020-03-12T14:01:46.626Z</updated>
   <id>https://www.cdutcl.com/</id>
   
   <author>
@@ -15,6 +15,65 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>(Xilinx-7系配置4) 配置加载流程</title>
+    <link href="https://www.cdutcl.com/posts/ea757907/"/>
+    <id>https://www.cdutcl.com/posts/ea757907/</id>
+    <published>2020-03-12T12:37:58.000Z</published>
+    <updated>2020-03-12T14:01:46.626Z</updated>
+    
+    <content type="html"><![CDATA[<p>尽管7系列fpga配置接口有多种多样，但内部流程都是一样的，如下图所示：<br><img src="https://s1.ax1x.com/2020/03/12/8mmWUs.png" alt="8mmWUs.png"></p><ul><li>设备上电</li><li>清除配置</li><li>采样配置模式</li><li>查找同步</li><li>设备ID检测</li><li>加载配置位流</li><li>CRC校验</li><li>启动序列</li></ul><h3 id="阶段1-设备上电"><a href="#阶段1-设备上电" class="headerlink" title="阶段1. 设备上电"></a>阶段1. 设备上电</h3><p>FPGA的电源VCCO0、VCCAUX、VCCBRAM、VCCINT都需要正常上电，下面这些是配置需要的供电：<br><img src="https://s1.ax1x.com/2020/03/12/8mMKsK.png" alt="8mMKsK.png"></p><p>上电时序如下：<br><img src="https://s1.ax1x.com/2020/03/12/8m1tzR.png" alt="8m1tzR.png"></p><p>在fpga正常上电或配置后，可以通过拉低PROGRAM_B管脚重配置FPGA，时序如下：<br><img src="https://s1.ax1x.com/2020/03/12/8mGAIO.png" alt="8mGAIO.png"></p><p>从上图可以看出，加载模式管脚是在INIT_B上升沿采样的。</p><h3 id="阶段2-清除配置"><a href="#阶段2-清除配置" class="headerlink" title="阶段2. 清除配置"></a>阶段2. 清除配置</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mGRyR.png" alt="8mGRyR.png"><br>紧接着上电阶段、或者PROGRAM_B拉低后、或者JTAG发送JPROGRAM指令后、或者IPROG命令后、或者fallback发生后，开始进行配置区域清除操作。BRAM恢复到初始态，FF等通过GSR全局复位管脚复位。通过GTS信号，将IO管脚都置为高阻态，如果PUDC_B管脚为低，IO上会有一个上拉电阻使能。这时INIT_B由FPGA内部驱动拉低，等待时间TPOR后(参考前面时序图)释放INIT_B，INIT_B由外部上拉电阻拉高。如果外部强制把INIT_B拉低，也就是说不让INIT_B起来，就可以实现延迟启动的功能。</p><h3 id="阶段3-采样配置模式"><a href="#阶段3-采样配置模式" class="headerlink" title="阶段3. 采样配置模式"></a>阶段3. 采样配置模式</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mt9Mj.png" alt="8mt9Mj.png"><br>当INIT_B上升沿发生，FPGA采样M[2:0]配置管脚，如果是Master模式就驱动CCLK输出，对于BPI或者SelectMap模式，这时内部状态是x8模式，这个模式会持续到位宽检测那个时刻。</p><h3 id="阶段4-查找同步"><a href="#阶段4-查找同步" class="headerlink" title="阶段4. 查找同步"></a>阶段4. 查找同步</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mtbpF.png" alt="8mtbpF.png"><br>基于上一步采样的模式，接下来就开始读取配置数据了，配置数据的头部，都含有用于判断位宽的数据，位宽判断方法请参考我另外一篇博文：<a href="https://www.cdutcl.com/posts/60ffd69e/">位流位宽检测机理</a>，当总线位宽确定后，就按照真实位宽查找配置数据中的同步头数据(0xAA995566)。</p><h3 id="阶段5-设备ID检测"><a href="#阶段5-设备ID检测" class="headerlink" title="阶段5. 设备ID检测"></a>阶段5. 设备ID检测</h3><p><img src="https://s1.ax1x.com/2020/03/12/8maFeA.png" alt="8maFeA.png"><br>当找到同步头以后，需要判断ID后才能加载后面的位流，这样可以避免器件不匹配的错误。7系列的ID格式如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vvvv:fffffff:aaaaaaaaa:ccccccccccc1</span><br><span class="line"></span><br><span class="line">v: 4bit, version</span><br><span class="line">f: 7bit, family code</span><br><span class="line">a: 9bit, array code(4bit sub-family and 5bit device code)</span><br><span class="line">c: company code</span><br></pre></td></tr></table></figure><h3 id="阶段6-加载配置位流"><a href="#阶段6-加载配置位流" class="headerlink" title="阶段6. 加载配置位流"></a>阶段6. 加载配置位流</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mdM9K.png" alt="8mdM9K.png"><br>经过上述的同步字、ID检测后，接下来就是按照数据帧配置FPGA了。具体帧结构，等后面有时间写另外一篇博文来说明。</p><h3 id="阶段7-CRC校验"><a href="#阶段7-CRC校验" class="headerlink" title="阶段7. CRC校验"></a>阶段7. CRC校验</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mdf3T.png" alt="8mdf3T.png"><br>在加载数据帧时，FPGA会基于这些数据帧算出了一个CRC值，当所有的帧都加载完成以后，得到一个最终CRC，位流的尾部会有一个CRC期待值以及CRC检测指令。如果CRC检测不一致，FPGA会拉低INIT_B信号以表示CRC错误，然后中断配置流程。</p><h3 id="阶段8-启动序列"><a href="#阶段8-启动序列" class="headerlink" title="阶段8. 启动序列"></a>阶段8. 启动序列</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mBM90.png" alt="8mBM90.png"><br>通过前面的步骤，已经将配置位流正确的加载到了FPGA内部。这一步是FPGA的一个启动过程，又分为8个小的步骤(phases 0-7)：<br><img src="https://s1.ax1x.com/2020/03/12/8mBcEd.png" alt="8mBcEd.png"><br>当这几个步骤完成后，FPGA释放DONE信号，DONE信号由外部上拉电阻拉高。</p><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>整体过程如下图所示：<br><img src="https://s1.ax1x.com/2020/03/12/8mDDGq.png" alt="8mDDGq.png"></p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;尽管7系列fpga配置接口有多种多样，但内部流程都是一样的，如下图所示：&lt;br&gt;&lt;img src=&quot;https://s1.ax1x.com/2020/03/12/8mmWUs.png&quot; alt=&quot;8mmWUs.png&quot;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;设备上电&lt;/li&gt;
+&lt;li
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+      <category term="Xilinx 7系列配置" scheme="https://www.cdutcl.com/categories/XILINX/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>(Xilinx-7系配置3) bit swapping功能描述</title>
+    <link href="https://www.cdutcl.com/posts/2cc4f630/"/>
+    <id>https://www.cdutcl.com/posts/2cc4f630/</id>
+    <published>2020-03-12T09:58:59.000Z</published>
+    <updated>2020-03-12T12:11:34.825Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="1、位交换功能"><a href="#1、位交换功能" class="headerlink" title="1、位交换功能"></a>1、位交换功能</h2><p>xilinx位交换功能，主要是用在生成并行PROM配置文件的时候使用。生成spi的配置文件时，是不需要该功能的，而生成并行MCS时，默认是打开该功能的。</p><h2 id="2、功能详细描述"><a href="#2、功能详细描述" class="headerlink" title="2、功能详细描述"></a>2、功能详细描述</h2><p>位交换功能仅仅对字节操作，仅仅将byte数据高低位颠倒，如图所示：<br><img src="https://s1.ax1x.com/2020/03/12/8m9Mb6.png" alt="8m9Mb6.png"></p><h2 id="3、数据配置"><a href="#3、数据配置" class="headerlink" title="3、数据配置"></a>3、数据配置</h2><h3 id="3-1、8位并行模式"><a href="#3-1、8位并行模式" class="headerlink" title="3.1、8位并行模式"></a>3.1、8位并行模式</h3><p>拿同步字来举例，生成的bit位流中，原始同步数据和swap后数据如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">AA 99 55 66  </span><br><span class="line"> |  |  |  |</span><br><span class="line"> V  V  V  V</span><br><span class="line">55 99 AA 66</span><br></pre></td></tr></table></figure><p>假设配置总线是D[7:0]，按字节将数据传递到总线中，比如: </p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AA(10101010) &#x3D;&gt; 字节的MSB接D0 &#x3D;&gt; D[0:7](10101010) &#x3D;&gt; D[7:0](01010101)55</span><br></pre></td></tr></table></figure><p>所以，我们本来是要传递数据AA，到D[7:0]总线上数据变成了55。</p><h3 id="3-2、16位并行模式"><a href="#3-2、16位并行模式" class="headerlink" title="3.2、16位并行模式"></a>3.2、16位并行模式</h3><p>基于上述的8位模式，如果总线是16位，那么每个周期就传递2个字节，这里的规则是，先来的字节放在高位，流程如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-&gt; AA -&gt; 99 -&gt; 55 -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 55 -&gt; 99 -&gt; AA -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 5599 -&gt; AA66 -&gt;</span><br></pre></td></tr></table></figure><p>所以，16位总线D[15:0]上数据流就是：5599 -&gt; AA66  </p><h3 id="3-3、32位并行模式"><a href="#3-3、32位并行模式" class="headerlink" title="3.3、32位并行模式"></a>3.3、32位并行模式</h3><p>有了上述16位总线的规律，这个32位就好理解了：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-&gt; AA -&gt; 99 -&gt; 55 -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 55 -&gt; 99 -&gt; AA -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 5599AA66 -&gt;</span><br></pre></td></tr></table></figure><p>所以，32位总线D[31:0]上数据流就是：5599AA66  </p><h2 id="4、软件配置"><a href="#4、软件配置" class="headerlink" title="4、软件配置"></a>4、软件配置</h2><p>有了上述原理，我们就可以通过CPU读取BIN文件，然后通过并口配置fpga。<br>这里就可以根据CPU取数的大小端方式，然后按照顺序配置FPGA即可。</p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;1、位交换功能&quot;&gt;&lt;a href=&quot;#1、位交换功能&quot; class=&quot;headerlink&quot; title=&quot;1、位交换功能&quot;&gt;&lt;/a&gt;1、位交换功能&lt;/h2&gt;&lt;p&gt;xilinx位交换功能，主要是用在生成并行PROM配置文件的时候使用。生成spi的配置文件时，是不需
+      
+    
+    </summary>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+      <category term="Xilinx 7系列配置" scheme="https://www.cdutcl.com/categories/XILINX/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+  </entry>
   
   <entry>
     <title>VIM笔记-中文乱码问题</title>
@@ -42,11 +101,11 @@
   </entry>
   
   <entry>
-    <title>(Xilinx-7系配置) 位流位宽检测机理</title>
+    <title>(Xilinx-7系配置2) 位流位宽检测机理</title>
     <link href="https://www.cdutcl.com/posts/60ffd69e/"/>
     <id>https://www.cdutcl.com/posts/60ffd69e/</id>
     <published>2020-03-11T12:49:06.000Z</published>
-    <updated>2020-03-12T08:58:41.687Z</updated>
+    <updated>2020-03-12T09:55:45.968Z</updated>
     
     <content type="html"><![CDATA[<h2 id="位宽检测"><a href="#位宽检测" class="headerlink" title="位宽检测"></a>位宽检测</h2><p>每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。<br>检测机理如下：<br><img src="https://s1.ax1x.com/2020/03/12/8ZMWQK.png" alt="8ZMWQK.png"><br>如上图所示：<br>上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了：</p><h3 id="1-8位模式判断"><a href="#1-8位模式判断" class="headerlink" title="1. 8位模式判断"></a>1. 8位模式判断</h3><p>数据按字节输入：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">00-&gt;00-&gt;00-&gt;BB-&gt;11-&gt;22-&gt;00-&gt;44-&gt;</span><br></pre></td></tr></table></figure><p>判断到BB后紧跟着11，说明总线是8位宽度；</p><h3 id="2-16位模式判断"><a href="#2-16位模式判断" class="headerlink" title="2. 16位模式判断"></a>2. 16位模式判断</h3><p>数据按双字节输入：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0000-&gt;00BB-&gt;1122-&gt;0044-&gt;</span><br></pre></td></tr></table></figure><p>低8位中，BB后紧跟着22，说明总线是16位宽度；</p><h3 id="3-32位模式判断"><a href="#3-32位模式判断" class="headerlink" title="3. 32位模式判断"></a>3. 32位模式判断</h3><p>数据按四字节输入：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">000000BB-&gt;11220044-&gt;</span><br></pre></td></tr></table></figure><p>低8位中，BB后紧跟着44，说明总线是32位宽度；</p><p>根据如上机理，即可判断总线宽度。</p><hr>]]></content>
     
@@ -62,17 +121,19 @@
     
       <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
     
+      <category term="Xilinx 7系列配置" scheme="https://www.cdutcl.com/categories/XILINX/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/"/>
+    
     
       <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
     
   </entry>
   
   <entry>
-    <title>(Xilinx-7系配置) 数据文件格式</title>
+    <title>(Xilinx-7系配置1) 数据文件格式</title>
     <link href="https://www.cdutcl.com/posts/df2d2b3/"/>
     <id>https://www.cdutcl.com/posts/df2d2b3/</id>
     <published>2020-03-11T11:33:10.000Z</published>
-    <updated>2020-03-12T09:18:48.120Z</updated>
+    <updated>2020-03-12T09:55:39.460Z</updated>
     
     <content type="html"><![CDATA[<h2 id="配置文件后缀"><a href="#配置文件后缀" class="headerlink" title="配置文件后缀"></a>配置文件后缀</h2><h3 id="1-bit格式"><a href="#1-bit格式" class="headerlink" title="1. bit格式"></a>1. bit格式</h3><p>默认生成文件类型，包含一些冗余的头部信息，这些头部信息是不需要下载到FPGA里面的。bit文件可以直接通过jtag加载到fpga中，掉电消失。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMmGt.png" alt="8ZMmGt.png"></p><h3 id="2-rbt格式"><a href="#2-rbt格式" class="headerlink" title="2. rbt格式"></a>2. rbt格式</h3><p>在ISE中使能了-b选项、在vivado中使能了-raw_bitfile选项，就可以生成该文件，该文件内容和bit一致，只是说这个是ASCII格式，bit是bin格式。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMePI.png" alt="8ZMePI.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMVIA.png" alt="8ZMVIA.png"></p><h3 id="3-bin格式"><a href="#3-bin格式" class="headerlink" title="3. bin格式"></a>3. bin格式</h3><p>在ISE中使能了-g binary:yes选项、在vivado中使能了-bin_file选项，就可以生成该文件，该文件内容相当于bit文件剔除了头部冗余信息。后面完全一致。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMAVH.png" alt="8ZMAVH.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMEad.png" alt="8ZMEad.png"></p><h3 id="4-mcs格式"><a href="#4-mcs格式" class="headerlink" title="4. mcs格式"></a>4. mcs格式</h3><p>在vivado中，使用write_cfgmem -format mcs命令可以将bit文件转换成mcs文件，mcs文件也是ASCII格式，可以直接用文本工具打开，主要是在bin的基础上，增加了地址信息和校验信息。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMnRP.png" alt="8ZMnRP.png"></p><hr>]]></content>
     
@@ -87,6 +148,8 @@
     
     
       <category term="XILINX" scheme="https://www.cdutcl.com/categories/XILINX/"/>
+    
+      <category term="Xilinx 7系列配置" scheme="https://www.cdutcl.com/categories/XILINX/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/"/>
     
     
       <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>

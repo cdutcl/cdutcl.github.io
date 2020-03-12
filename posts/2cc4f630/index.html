@@ -23,22 +23,22 @@
     var CONFIG = {"hostname":"www.cdutcl.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="本文主要介绍如何移植uboot到EBAZ4205板子上去。由于EBAZ4205是个野板子，资料例程都很少，经过在网上不停搜寻，终于在网友hhuysqt的博客上，找到了例程，非常感谢hhuysqt提供的文章。  1. 环境初始化首先通过VM虚拟机安装ubuntu16.04，安装步骤网上有很多，不想去搜的可以参考这里。 安装好ubuntu操作系统后，接着安装xilinx的petalinux，关于pet">
+  <meta name="description" content="1、位交换功能xilinx位交换功能，主要是用在生成并行PROM配置文件的时候使用。生成spi的配置文件时，是不需要该功能的，而生成并行MCS时，默认是打开该功能的。 2、功能详细描述位交换功能仅仅对字节操作，仅仅将byte数据高低位颠倒，如图所示： 3、数据配置3.1、8位并行模式拿同步字来举例，生成的bit位流中，原始同步数据和swap后数据如下： 1234AA 99 55 66   |  |">
 <meta property="og:type" content="article">
-<meta property="og:title" content="EBAZ4205 Uboot移植过程">
-<meta property="og:url" content="https://www.cdutcl.com/posts/28c1a47d/index.html">
+<meta property="og:title" content="(Xilinx-7系配置3) bit swapping功能描述">
+<meta property="og:url" content="https://www.cdutcl.com/posts/2cc4f630/index.html">
 <meta property="og:site_name" content="CDUTCL">
-<meta property="og:description" content="本文主要介绍如何移植uboot到EBAZ4205板子上去。由于EBAZ4205是个野板子，资料例程都很少，经过在网上不停搜寻，终于在网友hhuysqt的博客上，找到了例程，非常感谢hhuysqt提供的文章。  1. 环境初始化首先通过VM虚拟机安装ubuntu16.04，安装步骤网上有很多，不想去搜的可以参考这里。 安装好ubuntu操作系统后，接着安装xilinx的petalinux，关于pet">
+<meta property="og:description" content="1、位交换功能xilinx位交换功能，主要是用在生成并行PROM配置文件的时候使用。生成spi的配置文件时，是不需要该功能的，而生成并行MCS时，默认是打开该功能的。 2、功能详细描述位交换功能仅仅对字节操作，仅仅将byte数据高低位颠倒，如图所示： 3、数据配置3.1、8位并行模式拿同步字来举例，生成的bit位流中，原始同步数据和swap后数据如下： 1234AA 99 55 66   |  |">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-02-28T00:43:00.000Z">
-<meta property="article:modified_time" content="2020-03-12T08:58:41.676Z">
+<meta property="og:image" content="https://s1.ax1x.com/2020/03/12/8m9Mb6.png">
+<meta property="article:published_time" content="2020-03-12T09:58:59.000Z">
+<meta property="article:modified_time" content="2020-03-12T12:11:34.825Z">
 <meta property="article:author" content="cdutcl">
 <meta property="article:tag" content="XILINX">
-<meta property="article:tag" content="ZYNQ">
-<meta property="article:tag" content="EBAZ4205">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s1.ax1x.com/2020/03/12/8m9Mb6.png">
 
-<link rel="canonical" href="https://www.cdutcl.com/posts/28c1a47d/">
+<link rel="canonical" href="https://www.cdutcl.com/posts/2cc4f630/">
 
 
 <script id="page-configurations">
@@ -50,7 +50,7 @@
   };
 </script>
 
-  <title>EBAZ4205 Uboot移植过程 | CDUTCL</title>
+  <title>(Xilinx-7系配置3) bit swapping功能描述 | CDUTCL</title>
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-159222686-1"></script>
     <script>
@@ -205,7 +205,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/posts/28c1a47d/">
+    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/posts/2cc4f630/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -218,7 +218,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          EBAZ4205 Uboot移植过程
+          (Xilinx-7系配置3) bit swapping功能描述
         </h1>
 
         <div class="post-meta">
@@ -227,16 +227,10 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020/02/28 08:43:00" itemprop="dateCreated datePublished" datetime="2020-02-28T08:43:00+08:00">2020/02/28</time>
+              <time title="创建时间：2020/03/12 17:58:59 / 修改时间：20:11:34" itemprop="dateCreated datePublished" datetime="2020-03-12T17:58:59+08:00">2020/03/12</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020/03/12 16:58:41" itemprop="dateModified" datetime="2020-03-12T16:58:41+08:00">2020/03/12</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -247,7 +241,7 @@
                 </span>
                   ，
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/XILINX/EBAZ4205/" itemprop="url" rel="index"><span itemprop="name">EBAZ4205</span></a>
+                  <a href="/categories/XILINX/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">Xilinx 7系列配置</span></a>
                 </span>
             </span>
 
@@ -264,14 +258,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2k</span>
+              <span>824</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -283,36 +277,20 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>本文主要介绍如何移植uboot到EBAZ4205板子上去。由于EBAZ4205是个野板子，资料例程都很少，经过在网上不停搜寻，终于在网友hhuysqt的博客上，找到了例程，非常感谢hhuysqt提供的<a href="https://hhuysqt.github.io/zynq2/" target="_blank" rel="noopener">文章</a>。</p>
-<hr>
-<h2 id="1-环境初始化"><a href="#1-环境初始化" class="headerlink" title="1. 环境初始化"></a>1. 环境初始化</h2><p>首先通过VM虚拟机安装ubuntu16.04，安装步骤网上有很多，不想去搜的可以参考<a href="https://www.jianshu.com/p/faf8bbbdd0f2" target="_blank" rel="noopener">这里</a>。</p>
-<p>安装好ubuntu操作系统后，接着安装xilinx的petalinux，关于petalinux的安装，可以直接参考xilinx官方文档ug1144，里面详细描述了如何安装，这里也不再累述了。我把petalinux安装在下面的路径里了：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">/opt/pkg/petalinux/2018.3/</span><br><span class="line">```  </span><br><span class="line">  </span><br><span class="line">---</span><br><span class="line"><span class="comment">## 2. 下载uboot源码</span></span><br><span class="line">Xilinx官方提供了uboot源码，可以在github上面下载：  </span><br><span class="line">[https://github.com/Xilinx/u-boot-xlnx](https://github.com/Xilinx/u-boot-xlnx)  </span><br><span class="line">**这里提示一下：**由于github在国内访问很慢，<span class="built_in">clone</span>的方式可能会中断，建议直接下载压缩包。</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"><span class="comment">## 3. 生成Vivado工程</span></span><br><span class="line">基于ebaz4205板子搭建基本的vivado工程，具体过程可以参考这篇文章：  </span><br><span class="line">[https://hhuysqt.github.io/zynq1/](https://hhuysqt.github.io/zynq1/)  </span><br><span class="line">    </span><br><span class="line">搭建好工程以后，导出hdf并新建sdk工程，然后生成fsbl代码；</span><br><span class="line">    </span><br><span class="line">---</span><br><span class="line"><span class="comment">## 4. 生成设备树</span></span><br><span class="line">关于生成设备树，好像linux里面有比较方便的方式，这里我们采用SDK的方式：  </span><br><span class="line">- 首先下载设备树库文件，方法和上面下载uboot源码类似  </span><br><span class="line">    [https://github.com/Xilinx/device-tree-xlnx](https://github.com/Xilinx/device-tree-xlnx)  </span><br><span class="line">  </span><br><span class="line">- 解压下载的设备树库，然后在SDK工程中，添加这个库路径： Xilinx -&gt; Repositories </span><br><span class="line">![repo](https://xlnx.i.lithium.com/t5/image/serverpage/image-id/54730i0DD1C75B0E87E1B8/image-size/large?v=1.0&amp;px=999)  </span><br><span class="line">  </span><br><span class="line">- 然后用新建BSP的方式，新建一个该工程的设备树：File -&gt; New -&gt; Board Support Package  </span><br><span class="line">![new repo](https://xlnx.i.lithium.com/t5/image/serverpage/image-id/54731i8E31FFF7A9540097/image-size/large?v=1.0&amp;px=999)  </span><br><span class="line">  </span><br><span class="line">建立好上述工程后，在sdk路径下，就会生成一个device-tree的文件夹，然后将该文件夹拷贝到linux中，通过下面的命令即可编译出dtb文件：</span><br><span class="line">```bash</span><br><span class="line">dtc -I dts -O dtb -o system.dtb system-top.dts</span><br></pre></td></tr></table></figure>
-<p><strong>特别提醒</strong><br>如果直接采用默认方式生成的设备树，启动uboot后网口没法用，从log可以看出是网口没有配置，于是参照zc702的设备树，在工程生成的dts中，添加了如下配置：</p>
-<pre><code class="bash">&amp;gem0 {
-     status = <span class="string">"okay"</span>;
-     phy-mode = <span class="string">"rgmii-id"</span>;
-     phy-handle = &lt;&amp;ethernet_phy&gt;;
-     <span class="built_in">local</span>-mac-address = [00 0a 35 00 00 00];
-     ethernet_phy: ethernet-phy@0 {
-         reg = &lt;0&gt;;
-         device_type = <span class="string">"ethernet-phy"</span>;
-     };
-};</code></pre>
-<p>然后，重新生成dtb文件，后面基于该dtb文件生成的uboot即可成功使用网络。</p>
-<hr>
-<h2 id="4-编译uboot"><a href="#4-编译uboot" class="headerlink" title="4. 编译uboot"></a>4. 编译uboot</h2><p>解压源码，进入源码目录:  </p>
-<pre><code class="bash">$ <span class="built_in">cd</span> u-boot-xlnx-xilinx-v2019.2  </code></pre>
-<p>复制一份defconfig文件，这里我们基于zc702的配置来：</p>
-<pre><code class="bash">$ cp configs/zynq_zc702_defconfig configs/zynq_ebaz4205_defconfig</code></pre>
-<p>编辑ebaz4205的defconfig文件，并在最后增加配置：</p>
-<pre><code class="bash">CONFIG_NAND=y
-CONFIG_NAND_ZYNQ=y
-CONFIG_OF_EMBED=y</code></pre>
-<p>然后使用下述命令即可编译生成uboot：</p>
-<pre><code class="bash">make zynq_ebaz4205_defconfig
-make EXT_DTB=device_tree/system.dtb</code></pre>
-<p>然后我们就可以用生成的u-boot去生成BOOT.bin了<br><strong>友情提醒</strong><br>uboot编译后会有多个文件生成，我们得用u-boot，没有后缀那个，拷贝出去生成BOOT.bin时，记得要添加elf后缀。</p>
+        <h2 id="1、位交换功能"><a href="#1、位交换功能" class="headerlink" title="1、位交换功能"></a>1、位交换功能</h2><p>xilinx位交换功能，主要是用在生成并行PROM配置文件的时候使用。生成spi的配置文件时，是不需要该功能的，而生成并行MCS时，默认是打开该功能的。</p>
+<h2 id="2、功能详细描述"><a href="#2、功能详细描述" class="headerlink" title="2、功能详细描述"></a>2、功能详细描述</h2><p>位交换功能仅仅对字节操作，仅仅将byte数据高低位颠倒，如图所示：<br><img src="https://s1.ax1x.com/2020/03/12/8m9Mb6.png" alt="8m9Mb6.png"></p>
+<h2 id="3、数据配置"><a href="#3、数据配置" class="headerlink" title="3、数据配置"></a>3、数据配置</h2><h3 id="3-1、8位并行模式"><a href="#3-1、8位并行模式" class="headerlink" title="3.1、8位并行模式"></a>3.1、8位并行模式</h3><p>拿同步字来举例，生成的bit位流中，原始同步数据和swap后数据如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">AA 99 55 66  </span><br><span class="line"> |  |  |  |</span><br><span class="line"> V  V  V  V</span><br><span class="line">55 99 AA 66</span><br></pre></td></tr></table></figure>
+<p>假设配置总线是D[7:0]，按字节将数据传递到总线中，比如: </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AA(10101010) &#x3D;&gt; 字节的MSB接D0 &#x3D;&gt; D[0:7](10101010) &#x3D;&gt; D[7:0](01010101)55</span><br></pre></td></tr></table></figure>
+<p>所以，我们本来是要传递数据AA，到D[7:0]总线上数据变成了55。</p>
+<h3 id="3-2、16位并行模式"><a href="#3-2、16位并行模式" class="headerlink" title="3.2、16位并行模式"></a>3.2、16位并行模式</h3><p>基于上述的8位模式，如果总线是16位，那么每个周期就传递2个字节，这里的规则是，先来的字节放在高位，流程如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-&gt; AA -&gt; 99 -&gt; 55 -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 55 -&gt; 99 -&gt; AA -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 5599 -&gt; AA66 -&gt;</span><br></pre></td></tr></table></figure>
+<p>所以，16位总线D[15:0]上数据流就是：5599 -&gt; AA66  </p>
+<h3 id="3-3、32位并行模式"><a href="#3-3、32位并行模式" class="headerlink" title="3.3、32位并行模式"></a>3.3、32位并行模式</h3><p>有了上述16位总线的规律，这个32位就好理解了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-&gt; AA -&gt; 99 -&gt; 55 -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 55 -&gt; 99 -&gt; AA -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 5599AA66 -&gt;</span><br></pre></td></tr></table></figure>
+<p>所以，32位总线D[31:0]上数据流就是：5599AA66  </p>
+<h2 id="4、软件配置"><a href="#4、软件配置" class="headerlink" title="4、软件配置"></a>4、软件配置</h2><p>有了上述原理，我们就可以通过CPU读取BIN文件，然后通过并口配置fpga。<br>这里就可以根据CPU取数的大小端方式，然后按照顺序配置FPGA即可。</p>
 <hr>
 
     </div>
@@ -366,7 +344,7 @@ make EXT_DTB=device_tree/system.dtb</code></pre>
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://www.cdutcl.com/posts/28c1a47d/" title="EBAZ4205 Uboot移植过程">https://www.cdutcl.com/posts/28c1a47d/</a>
+    <a href="https://www.cdutcl.com/posts/2cc4f630/" title="(Xilinx-7系配置3) bit swapping功能描述">https://www.cdutcl.com/posts/2cc4f630/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -378,8 +356,6 @@ make EXT_DTB=device_tree/system.dtb</code></pre>
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/XILINX/" rel="tag"><i class="fa fa-tag"></i> XILINX</a>
-              <a href="/tags/ZYNQ/" rel="tag"><i class="fa fa-tag"></i> ZYNQ</a>
-              <a href="/tags/EBAZ4205/" rel="tag"><i class="fa fa-tag"></i> EBAZ4205</a>
           </div>
 
         
@@ -388,12 +364,12 @@ make EXT_DTB=device_tree/system.dtb</code></pre>
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/65cd9483/" rel="prev" title="Git远程操作">
-      <i class="fa fa-chevron-left"></i> Git远程操作
+    <a href="/posts/ed91337d/" rel="prev" title="VIM笔记-中文乱码问题">
+      <i class="fa fa-chevron-left"></i> VIM笔记-中文乱码问题
     </a></div>
       <div class="post-nav-item">
-    <a href="/posts/f1c8e5a2/" rel="next" title="EBAZ4205 Uboot移植（问题1）">
-      EBAZ4205 Uboot移植（问题1） <i class="fa fa-chevron-right"></i>
+    <a href="/posts/ea757907/" rel="next" title="(Xilinx-7系配置4) 配置加载流程">
+      (Xilinx-7系配置4) 配置加载流程 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -454,7 +430,7 @@ make EXT_DTB=device_tree/system.dtb</code></pre>
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-环境初始化"><span class="nav-number">1.</span> <span class="nav-text">1. 环境初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-编译uboot"><span class="nav-number">2.</span> <span class="nav-text">4. 编译uboot</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、位交换功能"><span class="nav-number">1.</span> <span class="nav-text">1、位交换功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、功能详细描述"><span class="nav-number">2.</span> <span class="nav-text">2、功能详细描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、数据配置"><span class="nav-number">3.</span> <span class="nav-text">3、数据配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1、8位并行模式"><span class="nav-number">3.1.</span> <span class="nav-text">3.1、8位并行模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2、16位并行模式"><span class="nav-number">3.2.</span> <span class="nav-text">3.2、16位并行模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3、32位并行模式"><span class="nav-number">3.3.</span> <span class="nav-text">3.3、32位并行模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4、软件配置"><span class="nav-number">4.</span> <span class="nav-text">4、软件配置</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

@@ -200,6 +200,231 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/posts/ea757907/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cdutcl">
+      <meta itemprop="description" content="FPGA">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CDUTCL">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/ea757907/" class="post-title-link" itemprop="url">(Xilinx-7系配置4) 配置加载流程</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020/03/12 20:37:58 / 修改时间：22:01:46" itemprop="dateCreated datePublished" datetime="2020-03-12T20:37:58+08:00">2020/03/12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">Xilinx 7系列配置</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>尽管7系列fpga配置接口有多种多样，但内部流程都是一样的，如下图所示：<br><img src="https://s1.ax1x.com/2020/03/12/8mmWUs.png" alt="8mmWUs.png"></p>
+<ul>
+<li>设备上电</li>
+<li>清除配置</li>
+<li>采样配置模式</li>
+<li>查找同步</li>
+<li>设备ID检测</li>
+<li>加载配置位流</li>
+<li>CRC校验</li>
+<li>启动序列</li>
+</ul>
+<h3 id="阶段1-设备上电"><a href="#阶段1-设备上电" class="headerlink" title="阶段1. 设备上电"></a>阶段1. 设备上电</h3><p>FPGA的电源VCCO0、VCCAUX、VCCBRAM、VCCINT都需要正常上电，下面这些是配置需要的供电：<br><img src="https://s1.ax1x.com/2020/03/12/8mMKsK.png" alt="8mMKsK.png"></p>
+<p>上电时序如下：<br><img src="https://s1.ax1x.com/2020/03/12/8m1tzR.png" alt="8m1tzR.png"></p>
+<p>在fpga正常上电或配置后，可以通过拉低PROGRAM_B管脚重配置FPGA，时序如下：<br><img src="https://s1.ax1x.com/2020/03/12/8mGAIO.png" alt="8mGAIO.png"></p>
+<p>从上图可以看出，加载模式管脚是在INIT_B上升沿采样的。</p>
+<h3 id="阶段2-清除配置"><a href="#阶段2-清除配置" class="headerlink" title="阶段2. 清除配置"></a>阶段2. 清除配置</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mGRyR.png" alt="8mGRyR.png"><br>紧接着上电阶段、或者PROGRAM_B拉低后、或者JTAG发送JPROGRAM指令后、或者IPROG命令后、或者fallback发生后，开始进行配置区域清除操作。BRAM恢复到初始态，FF等通过GSR全局复位管脚复位。通过GTS信号，将IO管脚都置为高阻态，如果PUDC_B管脚为低，IO上会有一个上拉电阻使能。这时INIT_B由FPGA内部驱动拉低，等待时间TPOR后(参考前面时序图)释放INIT_B，INIT_B由外部上拉电阻拉高。如果外部强制把INIT_B拉低，也就是说不让INIT_B起来，就可以实现延迟启动的功能。</p>
+<h3 id="阶段3-采样配置模式"><a href="#阶段3-采样配置模式" class="headerlink" title="阶段3. 采样配置模式"></a>阶段3. 采样配置模式</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mt9Mj.png" alt="8mt9Mj.png"><br>当INIT_B上升沿发生，FPGA采样M[2:0]配置管脚，如果是Master模式就驱动CCLK输出，对于BPI或者SelectMap模式，这时内部状态是x8模式，这个模式会持续到位宽检测那个时刻。</p>
+<h3 id="阶段4-查找同步"><a href="#阶段4-查找同步" class="headerlink" title="阶段4. 查找同步"></a>阶段4. 查找同步</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mtbpF.png" alt="8mtbpF.png"><br>基于上一步采样的模式，接下来就开始读取配置数据了，配置数据的头部，都含有用于判断位宽的数据，位宽判断方法请参考我另外一篇博文：<a href="https://www.cdutcl.com/posts/60ffd69e/">位流位宽检测机理</a>，当总线位宽确定后，就按照真实位宽查找配置数据中的同步头数据(0xAA995566)。</p>
+<h3 id="阶段5-设备ID检测"><a href="#阶段5-设备ID检测" class="headerlink" title="阶段5. 设备ID检测"></a>阶段5. 设备ID检测</h3><p><img src="https://s1.ax1x.com/2020/03/12/8maFeA.png" alt="8maFeA.png"><br>当找到同步头以后，需要判断ID后才能加载后面的位流，这样可以避免器件不匹配的错误。7系列的ID格式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vvvv:fffffff:aaaaaaaaa:ccccccccccc1</span><br><span class="line"></span><br><span class="line">v: 4bit, version</span><br><span class="line">f: 7bit, family code</span><br><span class="line">a: 9bit, array code(4bit sub-family and 5bit device code)</span><br><span class="line">c: company code</span><br></pre></td></tr></table></figure>
+
+<h3 id="阶段6-加载配置位流"><a href="#阶段6-加载配置位流" class="headerlink" title="阶段6. 加载配置位流"></a>阶段6. 加载配置位流</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mdM9K.png" alt="8mdM9K.png"><br>经过上述的同步字、ID检测后，接下来就是按照数据帧配置FPGA了。具体帧结构，等后面有时间写另外一篇博文来说明。</p>
+<h3 id="阶段7-CRC校验"><a href="#阶段7-CRC校验" class="headerlink" title="阶段7. CRC校验"></a>阶段7. CRC校验</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mdf3T.png" alt="8mdf3T.png"><br>在加载数据帧时，FPGA会基于这些数据帧算出了一个CRC值，当所有的帧都加载完成以后，得到一个最终CRC，位流的尾部会有一个CRC期待值以及CRC检测指令。如果CRC检测不一致，FPGA会拉低INIT_B信号以表示CRC错误，然后中断配置流程。</p>
+<h3 id="阶段8-启动序列"><a href="#阶段8-启动序列" class="headerlink" title="阶段8. 启动序列"></a>阶段8. 启动序列</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mBM90.png" alt="8mBM90.png"><br>通过前面的步骤，已经将配置位流正确的加载到了FPGA内部。这一步是FPGA的一个启动过程，又分为8个小的步骤(phases 0-7)：<br><img src="https://s1.ax1x.com/2020/03/12/8mBcEd.png" alt="8mBcEd.png"><br>当这几个步骤完成后，FPGA释放DONE信号，DONE信号由外部上拉电阻拉高。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>整体过程如下图所示：<br><img src="https://s1.ax1x.com/2020/03/12/8mDDGq.png" alt="8mDDGq.png"></p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+    <div>
+      
+    </div>
+
+    <div>
+          
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/posts/2cc4f630/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cdutcl">
+      <meta itemprop="description" content="FPGA">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CDUTCL">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/2cc4f630/" class="post-title-link" itemprop="url">(Xilinx-7系配置3) bit swapping功能描述</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020/03/12 17:58:59 / 修改时间：20:11:34" itemprop="dateCreated datePublished" datetime="2020-03-12T17:58:59+08:00">2020/03/12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">Xilinx 7系列配置</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>824</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="1、位交换功能"><a href="#1、位交换功能" class="headerlink" title="1、位交换功能"></a>1、位交换功能</h2><p>xilinx位交换功能，主要是用在生成并行PROM配置文件的时候使用。生成spi的配置文件时，是不需要该功能的，而生成并行MCS时，默认是打开该功能的。</p>
+<h2 id="2、功能详细描述"><a href="#2、功能详细描述" class="headerlink" title="2、功能详细描述"></a>2、功能详细描述</h2><p>位交换功能仅仅对字节操作，仅仅将byte数据高低位颠倒，如图所示：<br><img src="https://s1.ax1x.com/2020/03/12/8m9Mb6.png" alt="8m9Mb6.png"></p>
+<h2 id="3、数据配置"><a href="#3、数据配置" class="headerlink" title="3、数据配置"></a>3、数据配置</h2><h3 id="3-1、8位并行模式"><a href="#3-1、8位并行模式" class="headerlink" title="3.1、8位并行模式"></a>3.1、8位并行模式</h3><p>拿同步字来举例，生成的bit位流中，原始同步数据和swap后数据如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">AA 99 55 66  </span><br><span class="line"> |  |  |  |</span><br><span class="line"> V  V  V  V</span><br><span class="line">55 99 AA 66</span><br></pre></td></tr></table></figure>
+<p>假设配置总线是D[7:0]，按字节将数据传递到总线中，比如: </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AA(10101010) &#x3D;&gt; 字节的MSB接D0 &#x3D;&gt; D[0:7](10101010) &#x3D;&gt; D[7:0](01010101)55</span><br></pre></td></tr></table></figure>
+<p>所以，我们本来是要传递数据AA，到D[7:0]总线上数据变成了55。</p>
+<h3 id="3-2、16位并行模式"><a href="#3-2、16位并行模式" class="headerlink" title="3.2、16位并行模式"></a>3.2、16位并行模式</h3><p>基于上述的8位模式，如果总线是16位，那么每个周期就传递2个字节，这里的规则是，先来的字节放在高位，流程如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-&gt; AA -&gt; 99 -&gt; 55 -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 55 -&gt; 99 -&gt; AA -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 5599 -&gt; AA66 -&gt;</span><br></pre></td></tr></table></figure>
+<p>所以，16位总线D[15:0]上数据流就是：5599 -&gt; AA66  </p>
+<h3 id="3-3、32位并行模式"><a href="#3-3、32位并行模式" class="headerlink" title="3.3、32位并行模式"></a>3.3、32位并行模式</h3><p>有了上述16位总线的规律，这个32位就好理解了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-&gt; AA -&gt; 99 -&gt; 55 -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 55 -&gt; 99 -&gt; AA -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 5599AA66 -&gt;</span><br></pre></td></tr></table></figure>
+<p>所以，32位总线D[31:0]上数据流就是：5599AA66  </p>
+<h2 id="4、软件配置"><a href="#4、软件配置" class="headerlink" title="4、软件配置"></a>4、软件配置</h2><p>有了上述原理，我们就可以通过CPU读取BIN文件，然后通过并口配置fpga。<br>这里就可以根据CPU取数的大小端方式，然后按照顺序配置FPGA即可。</p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+    <div>
+      
+    </div>
+
+    <div>
+          
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/posts/ed91337d/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -314,7 +539,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/posts/60ffd69e/" class="post-title-link" itemprop="url">(Xilinx-7系配置) 位流位宽检测机理</a>
+            <a href="/posts/60ffd69e/" class="post-title-link" itemprop="url">(Xilinx-7系配置2) 位流位宽检测机理</a>
         </h1>
 
         <div class="post-meta">
@@ -331,7 +556,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020/03/12 16:58:41" itemprop="dateModified" datetime="2020-03-12T16:58:41+08:00">2020/03/12</time>
+                <time title="修改时间：2020/03/12 17:55:45" itemprop="dateModified" datetime="2020-03-12T17:55:45+08:00">2020/03/12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -340,6 +565,10 @@
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">Xilinx 7系列配置</span></a>
                 </span>
             </span>
 
@@ -420,7 +649,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/posts/df2d2b3/" class="post-title-link" itemprop="url">(Xilinx-7系配置) 数据文件格式</a>
+            <a href="/posts/df2d2b3/" class="post-title-link" itemprop="url">(Xilinx-7系配置1) 数据文件格式</a>
         </h1>
 
         <div class="post-meta">
@@ -437,7 +666,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020/03/12 17:18:48" itemprop="dateModified" datetime="2020-03-12T17:18:48+08:00">2020/03/12</time>
+                <time title="修改时间：2020/03/12 17:55:39" itemprop="dateModified" datetime="2020-03-12T17:55:39+08:00">2020/03/12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -446,6 +675,10 @@
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">Xilinx 7系列配置</span></a>
                 </span>
             </span>
 
@@ -1043,213 +1276,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/posts/6f480b13/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="cdutcl">
-      <meta itemprop="description" content="FPGA">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CDUTCL">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/6f480b13/" class="post-title-link" itemprop="url">(Xilinx-7系列) LVDS供电</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020/03/03 19:33:36" itemprop="dateCreated datePublished" datetime="2020-03-03T19:33:36+08:00">2020/03/03</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020/03/12 16:58:41" itemprop="dateModified" datetime="2020-03-12T16:58:41+08:00">2020/03/12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>44</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>7系列IOBANK供电和LVDS电平规则。官方链接：<a href="https://www.xilinx.com/support/answers/43989.html" target="_blank" rel="noopener">AR#43989</a>  </p>
-<hr>
-<p>Checklist：<br><img src="https://www.xilinx.com/Image/hp_checklist_201409230904113294.PNG" alt="HPbank"><br><img src="https://www.xilinx.com/Image/hr_checklist_201409230904405649.PNG" alt="HRbank">    </p>
-<hr>
-
-      
-    </div>
-
-    
-    
-    
-    <div>
-      
-    </div>
-
-    <div>
-          
-    </div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/posts/5b72433c/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="cdutcl">
-      <meta itemprop="description" content="FPGA">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CDUTCL">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/5b72433c/" class="post-title-link" itemprop="url">Zynq电源设计注意事项</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020/03/03 19:13:26" itemprop="dateCreated datePublished" datetime="2020-03-03T19:13:26+08:00">2020/03/03</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020/03/12 16:58:41" itemprop="dateModified" datetime="2020-03-12T16:58:41+08:00">2020/03/12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>669</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>本文内容主要来自Xilinx官方手册ds191，描述在使用Xilinx Zynq芯片时，电源设计需要考虑的地方。    </p>
-<hr>
-<h2 id="1-背景介绍"><a href="#1-背景介绍" class="headerlink" title="1. 背景介绍"></a>1. 背景介绍</h2><p>Xilinx Zynq系列芯片，分为PS和PL两个大的部分，他们电源分别独立。所以供电时可以单独考虑。</p>
-<h2 id="2-电源汇总"><a href="#2-电源汇总" class="headerlink" title="2. 电源汇总"></a>2. 电源汇总</h2><h3 id="2-1-PS部分需要供电如下："><a href="#2-1-PS部分需要供电如下：" class="headerlink" title="2.1 PS部分需要供电如下："></a>2.1 PS部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">VCCPINT:  1.0V  </span><br><span class="line">VCCPAUX:  1.8V  </span><br><span class="line">VCCPLL:   1.8V  </span><br><span class="line">VCCO_DDR: 1.14V~1.89V  </span><br><span class="line">VCCO_MIO: 1.71V~3.465V</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-2-PL部分需要供电如下："><a href="#2-2-PL部分需要供电如下：" class="headerlink" title="2.2 PL部分需要供电如下："></a>2.2 PL部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">VCCINT:   1.0V  </span><br><span class="line">VCCBRAM:  1.0V  </span><br><span class="line">VCCAUX:   1.8V  </span><br><span class="line">VCCO:     1.14V~3.465V(HR)  1.14V~1.89V(HP)  </span><br><span class="line">VCCAUX_IO: 1.8V&#x2F;2.0V</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-3-GT部分需要供电如下："><a href="#2-3-GT部分需要供电如下：" class="headerlink" title="2.3 GT部分需要供电如下："></a>2.3 GT部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">VMGTAVCC: 1.0V(&lt;&#x3D;10.3125GHz) 1.05V(&gt;10.3125GHz) </span><br><span class="line">VMGTAVTT: 1.2V  </span><br><span class="line">VMGTVCCAUX: 1.8V</span><br><span class="line">VMGTAVTTRCAL: 1.2V</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-4-XADC部分需要供电如下："><a href="#2-4-XADC部分需要供电如下：" class="headerlink" title="2.4 XADC部分需要供电如下："></a>2.4 XADC部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">VCCADC:   1.8V</span><br><span class="line">VREFP:    1.25V</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-上下电时序"><a href="#3-上下电时序" class="headerlink" title="3. 上下电时序"></a>3. 上下电时序</h2><h3 id="3-1-PS部分上下电时序"><a href="#3-1-PS部分上下电时序" class="headerlink" title="3.1 PS部分上下电时序"></a>3.1 PS部分上下电时序</h3><p>上电：VCCPINT -&gt; VCCPAUX &amp; VCCPLL -&gt; VCCO(MIO0,MIO1,DDR)<br>下电：和上面相反。  </p>
-<h3 id="3-2-PL部分上下电时序"><a href="#3-2-PL部分上下电时序" class="headerlink" title="3.2 PL部分上下电时序"></a>3.2 PL部分上下电时序</h3><p>上电：VCCINT -&gt; VCCBRAM -&gt; VCCAUX -&gt; VCCAUX_IO -&gt; VCCO<br>下电：和上面相反。   </p>
-<h2 id="4-电源斜坡"><a href="#4-电源斜坡" class="headerlink" title="4. 电源斜坡"></a>4. 电源斜坡</h2><p>所有的电源斜坡：0.2ms ~ 50ms</p>
-<hr>
-
-      
-    </div>
-
-    
-    
-    
-    <div>
-      
-    </div>
-
-    <div>
-          
-    </div>
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1320,13 +1346,13 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -1357,23 +1383,23 @@
         
         
           <li>
+            <a href="/posts/ea757907/" title="(Xilinx-7系配置4) 配置加载流程" target="_blank">(Xilinx-7系配置4) 配置加载流程</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2cc4f630/" title="(Xilinx-7系配置3) bit swapping功能描述" target="_blank">(Xilinx-7系配置3) bit swapping功能描述</a>
+          </li>
+        
+          <li>
             <a href="/posts/ed91337d/" title="VIM笔记-中文乱码问题" target="_blank">VIM笔记-中文乱码问题</a>
           </li>
         
           <li>
-            <a href="/posts/60ffd69e/" title="(Xilinx-7系配置) 位流位宽检测机理" target="_blank">(Xilinx-7系配置) 位流位宽检测机理</a>
+            <a href="/posts/60ffd69e/" title="(Xilinx-7系配置2) 位流位宽检测机理" target="_blank">(Xilinx-7系配置2) 位流位宽检测机理</a>
           </li>
         
           <li>
-            <a href="/posts/df2d2b3/" title="(Xilinx-7系配置) 数据文件格式" target="_blank">(Xilinx-7系配置) 数据文件格式</a>
-          </li>
-        
-          <li>
-            <a href="/posts/87fd19ae/" title="Ubuntu18.04安装中文支持" target="_blank">Ubuntu18.04安装中文支持</a>
-          </li>
-        
-          <li>
-            <a href="/posts/33b86a6d/" title="Zynq外设之--地址空间" target="_blank">Zynq外设之--地址空间</a>
+            <a href="/posts/df2d2b3/" title="(Xilinx-7系配置1) 数据文件格式" target="_blank">(Xilinx-7系配置1) 数据文件格式</a>
           </li>
         
       </ul>
@@ -1407,13 +1433,13 @@
       <i class="fa fa-area-chart"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">12k</span>
+    <span title="站点总字数">14k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">11 分钟</span>
+    <span title="站点阅读时长">13 分钟</span>
 </div>
 
         

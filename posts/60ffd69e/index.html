@@ -25,14 +25,14 @@
 
   <meta name="description" content="位宽检测每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。检测机理如下：如上图所示：上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了： 1. 8位模式判断数据按字节输入： 100-&gt;00-&gt;00-&gt;BB-&gt;11-&gt;22-&gt;00-&gt;44-&gt;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="(Xilinx-7系配置) 位流位宽检测机理">
+<meta property="og:title" content="(Xilinx-7系配置2) 位流位宽检测机理">
 <meta property="og:url" content="https://www.cdutcl.com/posts/60ffd69e/index.html">
 <meta property="og:site_name" content="CDUTCL">
 <meta property="og:description" content="位宽检测每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。检测机理如下：如上图所示：上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了： 1. 8位模式判断数据按字节输入： 100-&gt;00-&gt;00-&gt;BB-&gt;11-&gt;22-&gt;00-&gt;44-&gt;">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://s1.ax1x.com/2020/03/12/8ZMWQK.png">
 <meta property="article:published_time" content="2020-03-11T12:49:06.000Z">
-<meta property="article:modified_time" content="2020-03-12T08:58:41.687Z">
+<meta property="article:modified_time" content="2020-03-12T09:55:45.968Z">
 <meta property="article:author" content="cdutcl">
 <meta property="article:tag" content="XILINX">
 <meta name="twitter:card" content="summary">
@@ -50,7 +50,7 @@
   };
 </script>
 
-  <title>(Xilinx-7系配置) 位流位宽检测机理 | CDUTCL</title>
+  <title>(Xilinx-7系配置2) 位流位宽检测机理 | CDUTCL</title>
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-159222686-1"></script>
     <script>
@@ -218,7 +218,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          (Xilinx-7系配置) 位流位宽检测机理
+          (Xilinx-7系配置2) 位流位宽检测机理
         </h1>
 
         <div class="post-meta">
@@ -235,7 +235,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020/03/12 16:58:41" itemprop="dateModified" datetime="2020-03-12T16:58:41+08:00">2020/03/12</time>
+                <time title="修改时间：2020/03/12 17:55:45" itemprop="dateModified" datetime="2020-03-12T17:55:45+08:00">2020/03/12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -244,6 +244,10 @@
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">Xilinx 7系列配置</span></a>
                 </span>
             </span>
 
@@ -343,7 +347,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://www.cdutcl.com/posts/60ffd69e/" title="(Xilinx-7系配置) 位流位宽检测机理">https://www.cdutcl.com/posts/60ffd69e/</a>
+    <a href="https://www.cdutcl.com/posts/60ffd69e/" title="(Xilinx-7系配置2) 位流位宽检测机理">https://www.cdutcl.com/posts/60ffd69e/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -363,8 +367,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/df2d2b3/" rel="prev" title="(Xilinx-7系配置) 数据文件格式">
-      <i class="fa fa-chevron-left"></i> (Xilinx-7系配置) 数据文件格式
+    <a href="/posts/df2d2b3/" rel="prev" title="(Xilinx-7系配置1) 数据文件格式">
+      <i class="fa fa-chevron-left"></i> (Xilinx-7系配置1) 数据文件格式
     </a></div>
       <div class="post-nav-item">
     <a href="/posts/ed91337d/" rel="next" title="VIM笔记-中文乱码问题">
@@ -443,13 +447,13 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -480,23 +484,23 @@
         
         
           <li>
+            <a href="/posts/ea757907/" title="(Xilinx-7系配置4) 配置加载流程" target="_blank">(Xilinx-7系配置4) 配置加载流程</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2cc4f630/" title="(Xilinx-7系配置3) bit swapping功能描述" target="_blank">(Xilinx-7系配置3) bit swapping功能描述</a>
+          </li>
+        
+          <li>
             <a href="/posts/ed91337d/" title="VIM笔记-中文乱码问题" target="_blank">VIM笔记-中文乱码问题</a>
           </li>
         
           <li>
-            <a href="/posts/60ffd69e/" title="(Xilinx-7系配置) 位流位宽检测机理" target="_blank">(Xilinx-7系配置) 位流位宽检测机理</a>
+            <a href="/posts/60ffd69e/" title="(Xilinx-7系配置2) 位流位宽检测机理" target="_blank">(Xilinx-7系配置2) 位流位宽检测机理</a>
           </li>
         
           <li>
-            <a href="/posts/df2d2b3/" title="(Xilinx-7系配置) 数据文件格式" target="_blank">(Xilinx-7系配置) 数据文件格式</a>
-          </li>
-        
-          <li>
-            <a href="/posts/87fd19ae/" title="Ubuntu18.04安装中文支持" target="_blank">Ubuntu18.04安装中文支持</a>
-          </li>
-        
-          <li>
-            <a href="/posts/33b86a6d/" title="Zynq外设之--地址空间" target="_blank">Zynq外设之--地址空间</a>
+            <a href="/posts/df2d2b3/" title="(Xilinx-7系配置1) 数据文件格式" target="_blank">(Xilinx-7系配置1) 数据文件格式</a>
           </li>
         
       </ul>
@@ -530,13 +534,13 @@
       <i class="fa fa-area-chart"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">12k</span>
+    <span title="站点总字数">14k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">11 分钟</span>
+    <span title="站点阅读时长">13 分钟</span>
 </div>
 
         

@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>VIM笔记-中文乱码问题</title>
-    <url>/2020/03/12/vim-coding/</url>
+    <url>/posts/ed91337d/</url>
     <content><![CDATA[<p>由于工作需要，可能经常需要在Windows和Linux两个环境中切换。Vim乱码一直是让我头疼的一个事情，网上描述该问题的文章有很多，但都是直接说怎么做的，没有讲清楚其中的原理，所以整理这篇文章，希望能把该问题彻底解释清楚：  </p>
 <h2 id="1-默认编码"><a href="#1-默认编码" class="headerlink" title="1. 默认编码"></a>1. 默认编码</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Windows中默认的文本编码是cp936，而Linux一般都是utf-8</span><br></pre></td></tr></table></figure>
 
@@ -31,7 +31,7 @@
   </entry>
   <entry>
     <title>(Xilinx-7系配置) 位流位宽检测机理</title>
-    <url>/2020/03/11/xilinx-7series-config2/</url>
+    <url>/posts/60ffd69e/</url>
     <content><![CDATA[<h2 id="位宽检测"><a href="#位宽检测" class="headerlink" title="位宽检测"></a>位宽检测</h2><p>每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。<br>检测机理如下：<br><img src="https://s1.ax1x.com/2020/03/12/8ZMWQK.png" alt="8ZMWQK.png"><br>如上图所示：<br>上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了：</p>
 <h3 id="1-8位模式判断"><a href="#1-8位模式判断" class="headerlink" title="1. 8位模式判断"></a>1. 8位模式判断</h3><p>数据按字节输入：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00-&gt;00-&gt;00-&gt;BB-&gt;11-&gt;22-&gt;00-&gt;44-&gt;</span><br></pre></td></tr></table></figure>
@@ -54,11 +54,11 @@
   </entry>
   <entry>
     <title>(Xilinx-7系配置) 数据文件格式</title>
-    <url>/2020/03/11/xilinx-7series-config1/</url>
-    <content><![CDATA[<h2 id="配置文件后缀"><a href="#配置文件后缀" class="headerlink" title="配置文件后缀"></a>配置文件后缀</h2><h3 id="1-bit："><a href="#1-bit：" class="headerlink" title="1. bit："></a>1. bit：</h3><p>默认生成文件类型，包含一些冗余的头部信息，这些头部信息是不需要下载到FPGA里面的。bit文件可以直接通过jtag加载到fpga中，掉电消失。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMmGt.png" alt="8ZMmGt.png"></p>
-<h3 id="2-rbt："><a href="#2-rbt：" class="headerlink" title="2. rbt："></a>2. rbt：</h3><p>在ISE中使能了-b选项、在vivado中使能了-raw_bitfile选项，就可以生成该文件，该文件内容和bit一致，只是说这个是ASCII格式，bit是bin格式。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMePI.png" alt="8ZMePI.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMVIA.png" alt="8ZMVIA.png"></p>
-<h3 id="3-bin："><a href="#3-bin：" class="headerlink" title="3. bin："></a>3. bin：</h3><p>在ISE中使能了-g binary:yes选项、在vivado中使能了-bin_file选项，就可以生成该文件，该文件内容相当于bit文件剔除了头部冗余信息。后面完全一致。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMAVH.png" alt="8ZMAVH.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMEad.png" alt="8ZMEad.png"></p>
-<h3 id="4-mcs："><a href="#4-mcs：" class="headerlink" title="4. mcs："></a>4. mcs：</h3><p>在vivado中，使用write_cfgmem -format mcs命令可以将bit文件转换成mcs文件，mcs文件也是ASCII格式，可以直接用文本工具打开，主要是在bin的基础上，增加了地址信息和校验信息。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMnRP.png" alt="8ZMnRP.png"></p>
+    <url>/posts/df2d2b3/</url>
+    <content><![CDATA[<h2 id="配置文件后缀"><a href="#配置文件后缀" class="headerlink" title="配置文件后缀"></a>配置文件后缀</h2><h3 id="1-bit格式"><a href="#1-bit格式" class="headerlink" title="1. bit格式"></a>1. bit格式</h3><p>默认生成文件类型，包含一些冗余的头部信息，这些头部信息是不需要下载到FPGA里面的。bit文件可以直接通过jtag加载到fpga中，掉电消失。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMmGt.png" alt="8ZMmGt.png"></p>
+<h3 id="2-rbt格式"><a href="#2-rbt格式" class="headerlink" title="2. rbt格式"></a>2. rbt格式</h3><p>在ISE中使能了-b选项、在vivado中使能了-raw_bitfile选项，就可以生成该文件，该文件内容和bit一致，只是说这个是ASCII格式，bit是bin格式。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMePI.png" alt="8ZMePI.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMVIA.png" alt="8ZMVIA.png"></p>
+<h3 id="3-bin格式"><a href="#3-bin格式" class="headerlink" title="3. bin格式"></a>3. bin格式</h3><p>在ISE中使能了-g binary:yes选项、在vivado中使能了-bin_file选项，就可以生成该文件，该文件内容相当于bit文件剔除了头部冗余信息。后面完全一致。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMAVH.png" alt="8ZMAVH.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMEad.png" alt="8ZMEad.png"></p>
+<h3 id="4-mcs格式"><a href="#4-mcs格式" class="headerlink" title="4. mcs格式"></a>4. mcs格式</h3><p>在vivado中，使用write_cfgmem -format mcs命令可以将bit文件转换成mcs文件，mcs文件也是ASCII格式，可以直接用文本工具打开，主要是在bin的基础上，增加了地址信息和校验信息。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMnRP.png" alt="8ZMnRP.png"></p>
 <hr>
 ]]></content>
       <categories>
@@ -70,7 +70,7 @@
   </entry>
   <entry>
     <title>Ubuntu18.04安装中文支持</title>
-    <url>/2020/03/09/linux-ubuntu-cn/</url>
+    <url>/posts/87fd19ae/</url>
     <content><![CDATA[<p>原文链接：<a href="https://blog.csdn.net/AsynSpace/article/details/86293500" target="_blank" rel="noopener">https://blog.csdn.net/AsynSpace/article/details/86293500</a></p>
 <p>安装之前，执行</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$LANG</span></span><br></pre></td></tr></table></figure>
@@ -104,7 +104,7 @@
   </entry>
   <entry>
     <title>Zynq外设之--地址空间</title>
-    <url>/2020/03/09/xilinx-zynq-address/</url>
+    <url>/posts/33b86a6d/</url>
     <content><![CDATA[<p>Zynq系列器件，系统空间分布如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1soQ.png" alt="8Z1soQ.png"></p>
 <p>其中，PS端的IO外设挂在32位APB总线下，地址分布如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1rdg.png" alt="8Z1rdg.png"></p>
 <p>SMC地址空间如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z10L8.png" alt="8Z10L8.png"></p>
@@ -121,7 +121,7 @@
   </entry>
   <entry>
     <title>Zynq外设之--GPIO</title>
-    <url>/2020/03/09/xilinx-zynq-gpio/</url>
+    <url>/posts/21e5acfb/</url>
     <content><![CDATA[<p>本文内容主要来自官方手册ug585，根据个人理解整理成文。</p>
 <hr>
 <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Zynq的GPIO外设可以控制54个MIO，以及通过EMIO和PL交互的64个input、128个output。然后，这些IO分别分配到了4个BANK的GPIO控制器上。每个IO可以相互独立的配置为input、output、中断。</p>
@@ -146,7 +146,7 @@
   </entry>
   <entry>
     <title>常用电平标准汇总(TTL/LVTTL/CMOS/LVCOMS)</title>
-    <url>/2020/03/06/hardware-level/</url>
+    <url>/posts/68515062/</url>
     <content><![CDATA[<p>汇总常用电平标准。  </p>
 <hr>
 <h2 id="1-TTL"><a href="#1-TTL" class="headerlink" title="1. TTL"></a>1. TTL</h2><p>TTL(Transistor-Transistor Logic)三极管结构。</p>
@@ -175,7 +175,7 @@
   </entry>
   <entry>
     <title>patch命令用法</title>
-    <url>/2020/03/04/linux-patch-command/</url>
+    <url>/posts/bbe125fa/</url>
     <content><![CDATA[<p>要使用patch命令，先来看一下怎么用diff命令生成patch文件：  </p>
 <h2 id="diff命令"><a href="#diff命令" class="headerlink" title="diff命令"></a>diff命令</h2><p>diff命令用于查找两个文件或者两个文件夹的差异，可以用这个命令来生成patch补丁文件。  </p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ diff [选项] [源文件(夹)] [目的文件(夹)]</span><br><span class="line">  </span><br><span class="line">-r 递归处理，包括子文件夹及文件；</span><br><span class="line">-N 将缺席的文件视为空文件；</span><br><span class="line">-u 输出更详细的文件内容，生成patch要使用该参数，不然生成的patch不识别；</span><br></pre></td></tr></table></figure>
@@ -200,7 +200,7 @@
   </entry>
   <entry>
     <title>(Xilinx-7系列) LVDS供电</title>
-    <url>/2020/03/03/xilinx-7series-lvds/</url>
+    <url>/posts/6f480b13/</url>
     <content><![CDATA[<p>7系列IOBANK供电和LVDS电平规则。官方链接：<a href="https://www.xilinx.com/support/answers/43989.html" target="_blank" rel="noopener">AR#43989</a>  </p>
 <hr>
 <p>Checklist：<br><img src="https://www.xilinx.com/Image/hp_checklist_201409230904113294.PNG" alt="HPbank"><br><img src="https://www.xilinx.com/Image/hr_checklist_201409230904405649.PNG" alt="HRbank">    </p>
@@ -215,7 +215,7 @@
   </entry>
   <entry>
     <title>Zynq电源设计注意事项</title>
-    <url>/2020/03/03/xilinx-zynq-powerdesgin/</url>
+    <url>/posts/5b72433c/</url>
     <content><![CDATA[<p>本文内容主要来自Xilinx官方手册ds191，描述在使用Xilinx Zynq芯片时，电源设计需要考虑的地方。    </p>
 <hr>
 <h2 id="1-背景介绍"><a href="#1-背景介绍" class="headerlink" title="1. 背景介绍"></a>1. 背景介绍</h2><p>Xilinx Zynq系列芯片，分为PS和PL两个大的部分，他们电源分别独立。所以供电时可以单独考虑。</p>
@@ -242,7 +242,7 @@
   </entry>
   <entry>
     <title>EBAZ4205 Uboot移植（问题1）</title>
-    <url>/2020/03/02/ebaz4205-ubooterr1/</url>
+    <url>/posts/f1c8e5a2/</url>
     <content><![CDATA[<p>在网上找寻Zynq移植Linux的教程，大部分都是基于Xilinx官方步骤，采用petalinux那一套，为了搞清楚具体步骤，我采用了传统的一步一步的方式移植uboot。</p>
 <p><img src="https://s1.ax1x.com/2020/03/12/8Z3STe.jpg" alt="8Z3STe.jpg"></p>
 <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>编译好uboot后，用u-boot合并fsbl生成BOOT.bin，放入SD卡启动，出现了如下错误：</p>
@@ -276,7 +276,7 @@
   </entry>
   <entry>
     <title>EBAZ4205 Uboot移植过程</title>
-    <url>/2020/02/28/ebaz4205-uboot/</url>
+    <url>/posts/28c1a47d/</url>
     <content><![CDATA[<p>本文主要介绍如何移植uboot到EBAZ4205板子上去。由于EBAZ4205是个野板子，资料例程都很少，经过在网上不停搜寻，终于在网友hhuysqt的博客上，找到了例程，非常感谢hhuysqt提供的<a href="https://hhuysqt.github.io/zynq2/" target="_blank" rel="noopener">文章</a>。</p>
 <hr>
 <h2 id="1-环境初始化"><a href="#1-环境初始化" class="headerlink" title="1. 环境初始化"></a>1. 环境初始化</h2><p>首先通过VM虚拟机安装ubuntu16.04，安装步骤网上有很多，不想去搜的可以参考<a href="https://www.jianshu.com/p/faf8bbbdd0f2" target="_blank" rel="noopener">这里</a>。</p>
@@ -321,7 +321,7 @@ make EXT_DTB=device_tree/system.dtb</code></pre>
   </entry>
   <entry>
     <title>Git远程操作</title>
-    <url>/2020/02/27/linux-git-remote/</url>
+    <url>/posts/65cd9483/</url>
     <content><![CDATA[<p>本文整理总结了Git针对远程库的基本操作。<br>大部分内容参考了网上资料，然后根据自己理解整理成文。</p>
 <hr>
 <p>Git远程操作主要有以下几个命令：</p>
@@ -364,7 +364,7 @@ make EXT_DTB=device_tree/system.dtb</code></pre>
   </entry>
   <entry>
     <title>Vivado2018.1闪退问题</title>
-    <url>/2020/02/27/xilinx-vivado-err/</url>
+    <url>/posts/d82096fc/</url>
     <content><![CDATA[<p>有人在安装vivado2018.1以后，添加source后，出现闪退问题，通过上网查询，找到了解决办法。</p>
 <hr>
 <h2 id="官网给出了一个说明：AR-71064"><a href="#官网给出了一个说明：AR-71064" class="headerlink" title="官网给出了一个说明：AR#71064"></a>官网给出了一个说明：<a href="https://www.xilinx.com/support/answers/71064.html" target="_blank" rel="noopener">AR#71064</a></h2><p>从官方说明可以看出，这个问题可能出现在2017.1以后的版本。主要原因是srcscanner.exe这个程序的问题，2016.4以前的版本因为没有用这个程序，所以不会出问题。</p>
@@ -381,7 +381,7 @@ make EXT_DTB=device_tree/system.dtb</code></pre>
   </entry>
   <entry>
     <title>EBAZ4205 ZYNQ开发板初始化</title>
-    <url>/2020/02/27/ebaz4205-summy/</url>
+    <url>/posts/d5b766a5/</url>
     <content><![CDATA[<p>今天给大家介绍一个低成本的Zynq开发板：EBAZ4205</p>
 <p>成本有多低呢？(^_^) 我买了三块，<font color=#DC143C><strong>100元包邮!</strong></font><br>而且我还是买的比较晚了，据说再早些时候更便宜。</p>
 <hr>
@@ -414,7 +414,7 @@ make EXT_DTB=device_tree/system.dtb</code></pre>
   </entry>
   <entry>
     <title>Xilinx下载器驱动问题</title>
-    <url>/2020/02/26/xilinx-driver/</url>
+    <url>/posts/d826f08d/</url>
     <content><![CDATA[<p>Win10系统下，安装多个版本Vivado后，Xilinx DLC9驱动不识别问题。</p>
 <h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><p>刚开始，电脑上安装了Vivado2015.4和ISE14.7两个软件，使用一切正常。后续有了升级Vivado版本的需求，又在电脑上装了2017.4版本的Vivado。<br>装好了2017.4的版本后，当插上DLC9下载后，状态灯成暗红色（原来正常情况下应该亮红色），开发板通电后，DLC9的状态灯没有变化，依然是暗红色（正常应该变为绿色）。<br><img src="https://s1.ax1x.com/2020/03/12/8Zlk4A.png" alt="8Zlk4A.png"></p>
 <p>然后打开Vivado2017.4软件，进入Hardware Manager，然后点击Auto Connect后，从系统音判断，下载器出现了几次弹出操作，然后DLC9的灯状态变成绿色了，从设备管理器看驱动状态，好像也正常了。<br><img src="https://s1.ax1x.com/2020/03/12/8ZliAH.png" alt="8ZliAH.png"></p>

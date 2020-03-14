@@ -414,6 +414,7 @@ make EXT_DTB=device_tree/system.dtb</code></pre>
 
           </div>
           
+    <div class="comments" id="gitalk-container"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -643,6 +644,26 @@ make EXT_DTB=device_tree/system.dtb</code></pre>
   
 
   
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '4301ba6021b5e5784bf7',
+      clientSecret: 'ff87d303c720d4d253e5f4540942e9f9f5ad724c',
+      repo        : 'cdutcl.github.io',
+      owner       : 'cdutcl',
+      admin       : ['cdutcl'],
+      id          : '0e4ba9da3c2e090f17d789f590036493',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
 
 </body>
 </html>

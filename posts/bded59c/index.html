@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+  <script data-ad-client="ca-pub-8235718069863570" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.cdutcl.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="7系列FPGA的配置位流bit，头部开始有一些冗余的基本信息：比如bit的生成时间、生成工具的版本、top名称等信息。这些信息仅仅用于标识bit文件本身，不会下载到fpga或配置flash中。除去这些信息以外，其他剩下的就是下载到fpga、或flash中的数据。也就是bin文件的内容。 1、配置数据构成123456789101112131415161718192021222324252627282">
+<meta property="og:type" content="article">
+<meta property="og:title" content="(Xilinx-7系配置5) 配置bit位流格式">
+<meta property="og:url" content="https://www.cdutcl.com/posts/bded59c/index.html">
+<meta property="og:site_name" content="CDUTCL">
+<meta property="og:description" content="7系列FPGA的配置位流bit，头部开始有一些冗余的基本信息：比如bit的生成时间、生成工具的版本、top名称等信息。这些信息仅仅用于标识bit文件本身，不会下载到fpga或配置flash中。除去这些信息以外，其他剩下的就是下载到fpga、或flash中的数据。也就是bin文件的内容。 1、配置数据构成123456789101112131415161718192021222324252627282">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s1.ax1x.com/2020/03/14/8lGyXF.png">
+<meta property="article:published_time" content="2020-03-14T10:27:37.000Z">
+<meta property="article:modified_time" content="2020-03-14T12:42:08.644Z">
+<meta property="article:author" content="cdutcl">
+<meta property="article:tag" content="XILINX">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s1.ax1x.com/2020/03/14/8lGyXF.png">
+
+<link rel="canonical" href="https://www.cdutcl.com/posts/bded59c/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>(Xilinx-7系配置5) 配置bit位流格式 | CDUTCL</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-159222686-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-159222686-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?9748d74509578835f8d2dea2b209dfca";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="CDUTCL" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CDUTCL</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">cdutcl@gmail.com</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/posts/bded59c/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cdutcl">
+      <meta itemprop="description" content="FPGA">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CDUTCL">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          (Xilinx-7系配置5) 配置bit位流格式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020/03/14 18:27:37 / 修改时间：20:42:08" itemprop="dateCreated datePublished" datetime="2020-03-14T18:27:37+08:00">2020/03/14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">Xilinx 7系列配置</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>7系列FPGA的配置位流bit，头部开始有一些冗余的基本信息：比如bit的生成时间、生成工具的版本、top名称等信息。这些信息仅仅用于标识bit文件本身，不会下载到fpga或配置flash中。除去这些信息以外，其他剩下的就是下载到fpga、或flash中的数据。也就是bin文件的内容。</p>
+<h2 id="1、配置数据构成"><a href="#1、配置数据构成" class="headerlink" title="1、配置数据构成"></a>1、配置数据构成</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据1</span><br><span class="line">...</span><br><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据8</span><br><span class="line">000000BB    &#x2F;&#x2F; 总线位宽检测字1</span><br><span class="line">11220044    &#x2F;&#x2F; 总线位宽检测字2</span><br><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据</span><br><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据</span><br><span class="line">AA995566    &#x2F;&#x2F; 同步字</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">30022001    &#x2F;&#x2F; Packet Type 1: 写TIMER寄存器，WORD_COUNT&#x3D;1  # 具体格式在后面描述</span><br><span class="line">00000000    &#x2F;&#x2F; TIMER[31:0]&#x3D;00000000(hex)</span><br><span class="line">...         &#x2F;&#x2F; 具体内容可以去ug470查，我这里就不搬过来了。</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">...         &#x2F;&#x2F; NOOP数据</span><br><span class="line">30002001    &#x2F;&#x2F; Packet Type 1: 写FAR寄存器，WORD_COUNT&#x3D;1</span><br><span class="line">00000000    &#x2F;&#x2F; 写Frame地址为0</span><br><span class="line">30002001    &#x2F;&#x2F; Packet Type 1: 写CMD寄存器，WORD_COUNT&#x3D;1</span><br><span class="line">00000001    &#x2F;&#x2F; 00001 写配置数据命令</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">30004000    &#x2F;&#x2F; Packet Type 1: 写FDRI寄存器，WORD_COUNT&#x3D;0</span><br><span class="line">502BA520    &#x2F;&#x2F; Packet Type 2: 写FDRI寄存器，WORD_COUNT&#x3D;2860320</span><br><span class="line">00000000    &#x2F;&#x2F; 数据字1，之前都是配置寄存那些，从这里开始就是真正配置FPGA内部的配置数据，一帧一帧组合在一起</span><br><span class="line">...         &#x2F;&#x2F; 数据字N</span><br><span class="line">00000000    &#x2F;&#x2F; 数据字2860320( 101字&#x2F;帧 x 28320帧)</span><br><span class="line">30000001    &#x2F;&#x2F; Packet Type 1: 写CRC寄存器，WORD_COUNT&#x3D;1</span><br><span class="line">????????    &#x2F;&#x2F; 写CRC值，如果值和FPGA内部计算出来不一致，就进入错误态。</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">...         &#x2F;&#x2F; 然后又操作几个寄存器，比如释放同步信号等。</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">...         &#x2F;&#x2F; NOOP数据</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br></pre></td></tr></table></figure>
+
+<h2 id="2、配置数据帧"><a href="#2、配置数据帧" class="headerlink" title="2、配置数据帧"></a>2、配置数据帧</h2><p>如上述格式描述所示，bit其实就是由一些头部功能字段+配置寄存器字段+真实配置数据帧+收尾配置寄存器这几部分组成。7系列的配置数据由N个配置数据帧组成，每个帧由101个32位数据组成。</p>
+<h2 id="3、配置包格式"><a href="#3、配置包格式" class="headerlink" title="3、配置包格式"></a>3、配置包格式</h2><p>如上述格式描述所示，配置FPGA寄存器的操作是由配置包的形式，包格式有两种：type1和type2。<br>type1配置包格式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[31:29]: 001 &#x3D;&gt; type1</span><br><span class="line">[28:27]: xx  &#x3D;&gt; OP code (00: NOP  01: Read  10: Write  11: Reserved)</span><br><span class="line">[26:13]: xxx &#x3D;&gt; 低5位有效，标识寄存器地址</span><br><span class="line">[10:0 ]: xxx &#x3D;&gt; 11位，标识后面紧跟的32位数据个数</span><br></pre></td></tr></table></figure>
+<p>type2配置包格式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[31:29]: 010 &#x3D;&gt; type2</span><br><span class="line">[28:27]: xx  &#x3D;&gt; OP code (00: NOP  01: Read  10: Write  11: Reserved)</span><br><span class="line">[26:0 ]: xxx &#x3D;&gt; 27位，标识后面紧跟的32位数据个数</span><br></pre></td></tr></table></figure>
+<p>注意：type2配置包只能跟着type1，主要是为了用于写大段数据时，因为type1数据长度字段只有11位，不能表示太长的数据，所以才多出这么个type2配置包。</p>
+<h2 id="4、配置寄存器列表"><a href="#4、配置寄存器列表" class="headerlink" title="4、配置寄存器列表"></a>4、配置寄存器列表</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">(00)00000:  CRC     R&#x2F;W     &#x2F;&#x2F; CRC寄存器</span><br><span class="line">(01)00001:  FAR     R&#x2F;W     &#x2F;&#x2F; 帧地址寄存器</span><br><span class="line">(02)00010:  FDRI    WO      &#x2F;&#x2F; 写帧数据寄存器</span><br><span class="line">(03)00011:  FDRO    RO      &#x2F;&#x2F; 度帧数据寄存器</span><br><span class="line">(04)00100:  CMD     R&#x2F;W     &#x2F;&#x2F; 命令寄存器</span><br><span class="line">(05)00101:  CTL0    R&#x2F;W     &#x2F;&#x2F; 控制寄存器0</span><br><span class="line">(06)00110:  MASK    R&#x2F;W     &#x2F;&#x2F; 控制寄存器的MASK寄存器</span><br><span class="line">(07)00111:  STAT    RO      &#x2F;&#x2F; 状态寄存器</span><br><span class="line">(08)01000:  LOUT    WO      &#x2F;&#x2F; Legacy输出寄存器</span><br><span class="line">(09)01001:  COR0    R&#x2F;W     &#x2F;&#x2F; 配置寄存器0</span><br><span class="line">(0A)01010:  MFWR    WO      &#x2F;&#x2F; 多帧数据写寄存器</span><br><span class="line">(0B)01011:  CBC     WO      &#x2F;&#x2F; CBC值寄存器</span><br><span class="line">(0C)01100:  IDCODE  R&#x2F;W     &#x2F;&#x2F; 设备ID寄存器</span><br><span class="line">(0D)01101:  AXSS    R&#x2F;W     &#x2F;&#x2F; 用户寄存器</span><br><span class="line">(0E)01110:  COR1    R&#x2F;W     &#x2F;&#x2F; 配置寄存器1</span><br><span class="line">(10)10000:  WBSTAR  R&#x2F;W     &#x2F;&#x2F; 热跳转地址寄存器</span><br><span class="line">(11)10001:  TIMER   R&#x2F;W     &#x2F;&#x2F; 看门狗计时器</span><br><span class="line">(16)10110:  BOOTSTS RO      &#x2F;&#x2F; 启动历史状态寄存器</span><br><span class="line">(18)11000:  CTL1    R&#x2F;W     &#x2F;&#x2F; 控制寄存器1</span><br><span class="line">(1F)11111:  BSPI    R&#x2F;W     &#x2F;&#x2F; BPI&#x2F;SPI配置寄存器</span><br></pre></td></tr></table></figure>
+<p>下面我挑选一些常用寄存器的描述，如果想了解下面没描述到的寄存器，可以直接参考xilinx的ug470里面的内容：</p>
+<h3 id="4-1-FAR-帧地址寄存器详解"><a href="#4-1-FAR-帧地址寄存器详解" class="headerlink" title="4.1 FAR 帧地址寄存器详解"></a>4.1 FAR 帧地址寄存器详解</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[25:23]: 类型，000: CLB,I&#x2F;O,CLK  001: BRAM  010: CFG_CLB</span><br><span class="line">[22]:    0: 上半部分   1：下半部分</span><br><span class="line">[21:17]: 行地址</span><br><span class="line">[16:7]:  列地址</span><br><span class="line">[6:0]:   每列里面子地址</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-CMD-命令寄存器详解"><a href="#4-2-CMD-命令寄存器详解" class="headerlink" title="4.2 CMD 命令寄存器详解"></a>4.2 CMD 命令寄存器详解</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">00000:  NULL    &#x2F;&#x2F; 空命令</span><br><span class="line">00001:  WCFG    &#x2F;&#x2F; 写配置数据</span><br><span class="line">00010:  MFW     &#x2F;&#x2F; 写多帧数据</span><br><span class="line">00011:  DGHIGH  &#x2F;&#x2F; 最后一帧命令，用于释放内部的GHIGH_B信号</span><br><span class="line">00100:  RCFG    &#x2F;&#x2F; 读配置数据</span><br><span class="line">00101:  START   &#x2F;&#x2F; 启动Startup序列</span><br><span class="line">00110:  RCAP    &#x2F;&#x2F; 复位CAPTURE信号</span><br><span class="line">00111:  RCRC    &#x2F;&#x2F; 复位CRC值寄存器</span><br><span class="line">01000:  AGHIGH  &#x2F;&#x2F; 拉低内部GHIGH_B信号，用于将内部互联信号置为高阻，以免冲突</span><br><span class="line">01001:  SWITCH  &#x2F;&#x2F; 切换CCLK频率，CCLK频率具体值在COR0中配置</span><br><span class="line">01010:  GRESTORE&#x2F;&#x2F; 拉高GRESTORE信号，复位或置位IOB和CLB_FF</span><br><span class="line">01011:  SHUTDOWN&#x2F;&#x2F; 关闭序列</span><br><span class="line">01100:  GCAPTURE&#x2F;&#x2F; 拉高GCAPTURE信号</span><br><span class="line">01101:  DESYNC  &#x2F;&#x2F; 复位DALIGN信号，解同步指令</span><br><span class="line">01111:  IPROG   &#x2F;&#x2F; 内部PROG触发，Multiboot跳转</span><br><span class="line">10000:  CRCC    &#x2F;&#x2F; ！！！不晓得，没看懂！！！</span><br><span class="line">10001:  LTIMER  &#x2F;&#x2F; 重新Load看门狗</span><br><span class="line">10010:  BSPI_READ&#x2F;&#x2F; 重新读位流</span><br><span class="line">10011:  FALL_EDGE&#x2F;&#x2F; 下降沿采样</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-CTL0-控制寄存器0"><a href="#4-3-CTL0-控制寄存器0" class="headerlink" title="4.3 CTL0 控制寄存器0"></a>4.3 CTL0 控制寄存器0</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[31]: EFUSE_KEY         &#x2F;&#x2F; AES key存哪里，0：电池BRAM  1：eFUSE</span><br><span class="line">[30]: ICAP_SELECT       &#x2F;&#x2F; 0：用上半部的ICAPE2  1：用下半部的ICAPE2</span><br><span class="line">[12]: OverTempPowerDown &#x2F;&#x2F; 超温关机功能 0：关闭  1：打开</span><br><span class="line">[10]: ConfigFallback    &#x2F;&#x2F; 回读功能 0：使能  1：不使能</span><br><span class="line">[8]: GLUTMASK_B         &#x2F;&#x2F; 可变内容是否回读 0：读  1：不读</span><br><span class="line">[7]: FARSRC             &#x2F;&#x2F; 没看懂</span><br><span class="line">[6]: DEC                &#x2F;&#x2F; AES解密 0：不使能 1：使能</span><br><span class="line">[5:4]: SBITS            &#x2F;&#x2F; 秘密等级  00：写读都可以 01：关闭读  1x：写读都关闭</span><br><span class="line">[3]: PERSIST            &#x2F;&#x2F; 是否保持配置专用管脚功能  0：不保留  1：保留</span><br><span class="line">[0]: GTS_USR_B          &#x2F;&#x2F; 三态IO是否上下拉  0：不拉 1：上拉</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-5-STAT-状态寄存器"><a href="#4-5-STAT-状态寄存器" class="headerlink" title="4.5 STAT 状态寄存器"></a>4.5 STAT 状态寄存器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[26:25]: BUS_WIDTH      &#x2F;&#x2F; 00：x1 </span><br><span class="line">                           01：x8 </span><br><span class="line">                           10：x16 </span><br><span class="line">                           11：x32</span><br><span class="line">[20:18]: STARTUP_STATE  &#x2F;&#x2F; Phase 0 &#x3D; 000</span><br><span class="line">                           Phase 1 &#x3D; 001</span><br><span class="line">                           Phase 2 &#x3D; 011</span><br><span class="line">                           Phase 3 &#x3D; 010</span><br><span class="line">                           Phase 4 &#x3D; 110</span><br><span class="line">                           Phase 5 &#x3D; 111</span><br><span class="line">                           Phase 6 &#x3D; 101</span><br><span class="line">                           Phase 7 &#x3D; 100</span><br><span class="line">[16]: DEC_ERROR         &#x2F;&#x2F; 0: No error 1: ERROR</span><br><span class="line">[15]: ID_ERROR          &#x2F;&#x2F; 0: No error 1: ERROR</span><br><span class="line">[14]: DONE              &#x2F;&#x2F; DONE管脚状态</span><br><span class="line">[13]: RELEASE_DONE      &#x2F;&#x2F; DONE管脚内部状态</span><br><span class="line">[12]: INITB             &#x2F;&#x2F; INITB管脚状态</span><br><span class="line">[11]: RELEASE_INITB     &#x2F;&#x2F; INITB管脚内部状态</span><br><span class="line">[10:8]: MODE            &#x2F;&#x2F; M[2:0]管脚状态</span><br><span class="line">[7]: GHIGH_B            &#x2F;&#x2F; GHIGH_B信号状态</span><br><span class="line">[6]: GWE                &#x2F;&#x2F; GWE信号状态</span><br><span class="line">[5]: GTS_CFG_B          &#x2F;&#x2F; GTS_CFG_B信号状态</span><br><span class="line">[4]: EOS                &#x2F;&#x2F; 启动序列是否完成</span><br><span class="line">[3]: DCI_MATCH          &#x2F;&#x2F; DCI_MATCH</span><br><span class="line">[2]: MMCM_LOCK          &#x2F;&#x2F; MMCM_LOCK</span><br><span class="line">[1]: PART_SECURED       &#x2F;&#x2F; PART_SECURED</span><br><span class="line">[0]: CRC_ERROR          &#x2F;&#x2F; CRC_ERROR</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-6-COR0-配置寄存器0"><a href="#4-6-COR0-配置寄存器0" class="headerlink" title="4.6 COR0 配置寄存器0"></a>4.6 COR0 配置寄存器0</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[27]: PWRDWN_STAT       &#x2F;&#x2F; 改变DONE管脚功能为POWNDOWN</span><br><span class="line">[25]: DONE_PIPE         &#x2F;&#x2F; 是否寄存器一拍DONE信号</span><br><span class="line">[24]: DRIVE_DONE        &#x2F;&#x2F; 0：DONE信号开漏  1：DONE信号驱动</span><br><span class="line">[23]: SINGLE            &#x2F;&#x2F; 搞不懂</span><br><span class="line">[22:17]: OSCFSEL        &#x2F;&#x2F; CCLK频率，2M~60M</span><br><span class="line">[16:15]: SSCLKSRC       &#x2F;&#x2F; 00: CCLK  01:UserClk (per connection on the CAPTUREE2 block)  1x: JTAGClk</span><br><span class="line">[14:12]: DONE_CYCLE     &#x2F;&#x2F; DONE在哪个阶段起来</span><br><span class="line">                           000: Startup phase 1</span><br><span class="line">                           001: Startup phase 2</span><br><span class="line">                           010: Startup phase 3</span><br><span class="line">                           011: Startup phase 4</span><br><span class="line">                           100: Startup phase 5</span><br><span class="line">                           101: Startup phase 6</span><br><span class="line">                           111: Keep (not recommended)</span><br><span class="line">[11:9]: MATCH_CYCLE     &#x2F;&#x2F; DCI Match阶段</span><br><span class="line">[8:6]: LOCK_CYCLE       &#x2F;&#x2F; MMCK lock阶段</span><br><span class="line">[5:3]: GTS_CYCLE        &#x2F;&#x2F; GTS释放阶段</span><br><span class="line">[2:0]: GWE_CYCLE        &#x2F;&#x2F; GWE释放阶段</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-7-COR1-配置寄存器1"><a href="#4-7-COR1-配置寄存器1" class="headerlink" title="4.7 COR1 配置寄存器1"></a>4.7 COR1 配置寄存器1</h3><p>这里省略了一些我没理清除的一些内容。。。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[3:2]: BPI_1ST_READ_CYCLE &#x2F;&#x2F; First byte read timing:</span><br><span class="line">                             00: 1 CCLK (default)</span><br><span class="line">                             01: 2 CCLKs</span><br><span class="line">                             10: 3 CCLKs</span><br><span class="line">                             11: 4 CCLKs</span><br><span class="line">[1:0]: BPI_PAGE_SIZE      &#x2F;&#x2F; Flash memory page size:</span><br><span class="line">                             00: 1 byte&#x2F;word (default)</span><br><span class="line">                             01: 4 bytes&#x2F;words</span><br><span class="line">                             10: 8 bytes&#x2F;words</span><br><span class="line">                             11: Reserved</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-8-BPI配置寄存器"><a href="#4-8-BPI配置寄存器" class="headerlink" title="4.8 BPI配置寄存器"></a>4.8 BPI配置寄存器</h3><p><img src="https://s1.ax1x.com/2020/03/14/8lGyXF.png" alt="8lGyXF.png"></p>
+
+    </div>
+
+    
+    
+    
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+      
+    </div>
+
+    <div>
+          
+            
+
+          
+    </div>
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/weixin.png" alt="cdutcl 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/zhifubao.png" alt="cdutcl 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>cdutcl
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.cdutcl.com/posts/bded59c/" title="(Xilinx-7系配置5) 配置bit位流格式">https://www.cdutcl.com/posts/bded59c/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/XILINX/" rel="tag"><i class="fa fa-tag"></i> XILINX</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/ea757907/" rel="prev" title="(Xilinx-7系配置4) 配置加载流程">
+      <i class="fa fa-chevron-left"></i> (Xilinx-7系配置4) 配置加载流程
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、配置数据构成"><span class="nav-number">1.</span> <span class="nav-text">1、配置数据构成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、配置数据帧"><span class="nav-number">2.</span> <span class="nav-text">2、配置数据帧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、配置包格式"><span class="nav-number">3.</span> <span class="nav-text">3、配置包格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4、配置寄存器列表"><span class="nav-number">4.</span> <span class="nav-text">4、配置寄存器列表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-FAR-帧地址寄存器详解"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 FAR 帧地址寄存器详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-CMD-命令寄存器详解"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 CMD 命令寄存器详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-CTL0-控制寄存器0"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 CTL0 控制寄存器0</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-STAT-状态寄存器"><span class="nav-number">4.4.</span> <span class="nav-text">4.5 STAT 状态寄存器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-COR0-配置寄存器0"><span class="nav-number">4.5.</span> <span class="nav-text">4.6 COR0 配置寄存器0</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-7-COR1-配置寄存器1"><span class="nav-number">4.6.</span> <span class="nav-text">4.7 COR1 配置寄存器1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-8-BPI配置寄存器"><span class="nav-number">4.7.</span> <span class="nav-text">4.8 BPI配置寄存器</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">cdutcl</p>
+  <div class="site-description" itemprop="description">FPGA</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:cdutcl@gmail.com" title="E-Mail → mailto:cdutcl@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/cdutcl" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;cdutcl" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+    <div class="links-of-blogroll motion-element links-of-blogroll-block">
+      <div class="links-of-blogroll-title">
+        <!-- modify icon to fire by szw -->
+        <i class="fa fa-history fa-" aria-hidden="true"></i>
+        近期文章
+      </div>
+      <ul class="links-of-blogroll-list">
+        
+        
+          <li>
+            <a href="/posts/bded59c/" title="(Xilinx-7系配置5) 配置bit位流格式" target="_blank">(Xilinx-7系配置5) 配置bit位流格式</a>
+          </li>
+        
+          <li>
+            <a href="/posts/ea757907/" title="(Xilinx-7系配置4) 配置加载流程" target="_blank">(Xilinx-7系配置4) 配置加载流程</a>
+          </li>
+        
+          <li>
+            <a href="/posts/2cc4f630/" title="(Xilinx-7系配置3) bit swapping功能描述" target="_blank">(Xilinx-7系配置3) bit swapping功能描述</a>
+          </li>
+        
+          <li>
+            <a href="/posts/ed91337d/" title="VIM笔记-中文乱码问题" target="_blank">VIM笔记-中文乱码问题</a>
+          </li>
+        
+          <li>
+            <a href="/posts/60ffd69e/" title="(Xilinx-7系配置2) 位流位宽检测机理" target="_blank">(Xilinx-7系配置2) 位流位宽检测机理</a>
+          </li>
+        
+      </ul>
+    </div>
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2011 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">cdutcl</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">20k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">18 分钟</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

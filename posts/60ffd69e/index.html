@@ -23,16 +23,16 @@
     var CONFIG = {"hostname":"www.cdutcl.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="位宽检测每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。检测机理如下：如上图所示：上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了： 1. 8位模式判断数据按字节输入： 100-&gt;00-&gt;00-&gt;BB-&gt;11-&gt;22-&gt;00-&gt;44-&gt;">
+  <meta name="description" content="本文主要介绍xilinx7系列在上电加载时，对总线位宽自动检测的机制。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="(Xilinx-7系配置2) 位流位宽检测机理">
 <meta property="og:url" content="https://www.cdutcl.com/posts/60ffd69e/index.html">
 <meta property="og:site_name" content="CDUTCL">
-<meta property="og:description" content="位宽检测每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。检测机理如下：如上图所示：上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了： 1. 8位模式判断数据按字节输入： 100-&gt;00-&gt;00-&gt;BB-&gt;11-&gt;22-&gt;00-&gt;44-&gt;">
+<meta property="og:description" content="本文主要介绍xilinx7系列在上电加载时，对总线位宽自动检测的机制。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://s1.ax1x.com/2020/03/12/8ZMWQK.png">
-<meta property="article:published_time" content="2020-03-11T12:49:06.000Z">
-<meta property="article:modified_time" content="2020-03-12T09:55:45.968Z">
+<meta property="article:published_time" content="2018-04-12T12:49:06.000Z">
+<meta property="article:modified_time" content="2020-03-14T13:05:48.173Z">
 <meta property="article:author" content="cdutcl">
 <meta property="article:tag" content="XILINX">
 <meta name="twitter:card" content="summary">
@@ -228,14 +228,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020/03/11 20:49:06" itemprop="dateCreated datePublished" datetime="2020-03-11T20:49:06+08:00">2020/03/11</time>
+              <time title="创建时间：2018/04/12 20:49:06" itemprop="dateCreated datePublished" datetime="2018-04-12T20:49:06+08:00">2018/04/12</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020/03/12 17:55:45" itemprop="dateModified" datetime="2020-03-12T17:55:45+08:00">2020/03/12</time>
+                <time title="修改时间：2020/03/14 21:05:48" itemprop="dateModified" datetime="2020-03-14T21:05:48+08:00">2020/03/14</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -264,7 +264,7 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>385</span>
+              <span>420</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -283,7 +283,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="位宽检测"><a href="#位宽检测" class="headerlink" title="位宽检测"></a>位宽检测</h2><p>每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。<br>检测机理如下：<br><img src="https://s1.ax1x.com/2020/03/12/8ZMWQK.png" alt="8ZMWQK.png"><br>如上图所示：<br>上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了：</p>
+        <p>本文主要介绍xilinx7系列在上电加载时，对总线位宽自动检测的机制。</p>
+<a id="more"></a>
+<h2 id="位宽检测"><a href="#位宽检测" class="headerlink" title="位宽检测"></a>位宽检测</h2><p>每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。<br>检测机理如下：<br><img src="https://s1.ax1x.com/2020/03/12/8ZMWQK.png" alt="8ZMWQK.png"><br>如上图所示：<br>上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了：</p>
 <h3 id="1-8位模式判断"><a href="#1-8位模式判断" class="headerlink" title="1. 8位模式判断"></a>1. 8位模式判断</h3><p>数据按字节输入：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">00-&gt;00-&gt;00-&gt;BB-&gt;11-&gt;22-&gt;00-&gt;44-&gt;</span><br></pre></td></tr></table></figure>
 <p>判断到BB后紧跟着11，说明总线是8位宽度；</p>
@@ -360,6 +362,18 @@
           <div class="post-tags">
               <a href="/tags/XILINX/" rel="tag"><i class="fa fa-tag"></i> XILINX</a>
           </div>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+     style="display:block; text-align:center;"
+     data-ad-layout="in-article"
+     data-ad-format="fluid"
+     data-ad-client="ca-pub-8235718069863570"
+     data-ad-slot="3493436304"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
 
         
 
@@ -371,8 +385,8 @@
       <i class="fa fa-chevron-left"></i> (Xilinx-7系配置1) 数据文件格式
     </a></div>
       <div class="post-nav-item">
-    <a href="/posts/ed91337d/" rel="next" title="VIM笔记-中文乱码问题">
-      VIM笔记-中文乱码问题 <i class="fa fa-chevron-right"></i>
+    <a href="/posts/2cc4f630/" rel="next" title="(Xilinx-7系配置3) bit swapping功能描述">
+      (Xilinx-7系配置3) bit swapping功能描述 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -484,23 +498,23 @@
         
         
           <li>
-            <a href="/posts/bded59c/" title="(Xilinx-7系配置5) 配置bit位流格式" target="_blank">(Xilinx-7系配置5) 配置bit位流格式</a>
-          </li>
-        
-          <li>
-            <a href="/posts/ea757907/" title="(Xilinx-7系配置4) 配置加载流程" target="_blank">(Xilinx-7系配置4) 配置加载流程</a>
-          </li>
-        
-          <li>
-            <a href="/posts/2cc4f630/" title="(Xilinx-7系配置3) bit swapping功能描述" target="_blank">(Xilinx-7系配置3) bit swapping功能描述</a>
-          </li>
-        
-          <li>
             <a href="/posts/ed91337d/" title="VIM笔记-中文乱码问题" target="_blank">VIM笔记-中文乱码问题</a>
           </li>
         
           <li>
-            <a href="/posts/60ffd69e/" title="(Xilinx-7系配置2) 位流位宽检测机理" target="_blank">(Xilinx-7系配置2) 位流位宽检测机理</a>
+            <a href="/posts/87fd19ae/" title="Ubuntu18.04安装中文支持" target="_blank">Ubuntu18.04安装中文支持</a>
+          </li>
+        
+          <li>
+            <a href="/posts/68515062/" title="常用电平标准汇总(TTL/LVTTL/CMOS/LVCOMS)" target="_blank">常用电平标准汇总(TTL/LVTTL/CMOS/LVCOMS)</a>
+          </li>
+        
+          <li>
+            <a href="/posts/bbe125fa/" title="patch命令用法" target="_blank">patch命令用法</a>
+          </li>
+        
+          <li>
+            <a href="/posts/6f480b13/" title="(Xilinx-7系列) LVDS供电" target="_blank">(Xilinx-7系列) LVDS供电</a>
           </li>
         
       </ul>

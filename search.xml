@@ -1,111 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>(Xilinx-7系配置5) 配置bit位流格式</title>
-    <url>/posts/bded59c/</url>
-    <content><![CDATA[<p>7系列FPGA的配置位流bit，头部开始有一些冗余的基本信息：比如bit的生成时间、生成工具的版本、top名称等信息。这些信息仅仅用于标识bit文件本身，不会下载到fpga或配置flash中。除去这些信息以外，其他剩下的就是下载到fpga、或flash中的数据。也就是bin文件的内容。</p>
-<h2 id="1、配置数据构成"><a href="#1、配置数据构成" class="headerlink" title="1、配置数据构成"></a>1、配置数据构成</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据1</span><br><span class="line">...</span><br><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据8</span><br><span class="line">000000BB    &#x2F;&#x2F; 总线位宽检测字1</span><br><span class="line">11220044    &#x2F;&#x2F; 总线位宽检测字2</span><br><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据</span><br><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据</span><br><span class="line">AA995566    &#x2F;&#x2F; 同步字</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">30022001    &#x2F;&#x2F; Packet Type 1: 写TIMER寄存器，WORD_COUNT&#x3D;1  # 具体格式在后面描述</span><br><span class="line">00000000    &#x2F;&#x2F; TIMER[31:0]&#x3D;00000000(hex)</span><br><span class="line">...         &#x2F;&#x2F; 具体内容可以去ug470查，我这里就不搬过来了。</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">...         &#x2F;&#x2F; NOOP数据</span><br><span class="line">30002001    &#x2F;&#x2F; Packet Type 1: 写FAR寄存器，WORD_COUNT&#x3D;1</span><br><span class="line">00000000    &#x2F;&#x2F; 写Frame地址为0</span><br><span class="line">30002001    &#x2F;&#x2F; Packet Type 1: 写CMD寄存器，WORD_COUNT&#x3D;1</span><br><span class="line">00000001    &#x2F;&#x2F; 00001 写配置数据命令</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">30004000    &#x2F;&#x2F; Packet Type 1: 写FDRI寄存器，WORD_COUNT&#x3D;0</span><br><span class="line">502BA520    &#x2F;&#x2F; Packet Type 2: 写FDRI寄存器，WORD_COUNT&#x3D;2860320</span><br><span class="line">00000000    &#x2F;&#x2F; 数据字1，之前都是配置寄存那些，从这里开始就是真正配置FPGA内部的配置数据，一帧一帧组合在一起</span><br><span class="line">...         &#x2F;&#x2F; 数据字N</span><br><span class="line">00000000    &#x2F;&#x2F; 数据字2860320( 101字&#x2F;帧 x 28320帧)</span><br><span class="line">30000001    &#x2F;&#x2F; Packet Type 1: 写CRC寄存器，WORD_COUNT&#x3D;1</span><br><span class="line">????????    &#x2F;&#x2F; 写CRC值，如果值和FPGA内部计算出来不一致，就进入错误态。</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">...         &#x2F;&#x2F; 然后又操作几个寄存器，比如释放同步信号等。</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">...         &#x2F;&#x2F; NOOP数据</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br></pre></td></tr></table></figure>
-
-<h2 id="2、配置数据帧"><a href="#2、配置数据帧" class="headerlink" title="2、配置数据帧"></a>2、配置数据帧</h2><p>如上述格式描述所示，bit其实就是由一些头部功能字段+配置寄存器字段+真实配置数据帧+收尾配置寄存器这几部分组成。7系列的配置数据由N个配置数据帧组成，每个帧由101个32位数据组成。</p>
-<h2 id="3、配置包格式"><a href="#3、配置包格式" class="headerlink" title="3、配置包格式"></a>3、配置包格式</h2><p>如上述格式描述所示，配置FPGA寄存器的操作是由配置包的形式，包格式有两种：type1和type2。<br>type1配置包格式：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[31:29]: 001 &#x3D;&gt; type1</span><br><span class="line">[28:27]: xx  &#x3D;&gt; OP code (00: NOP  01: Read  10: Write  11: Reserved)</span><br><span class="line">[26:13]: xxx &#x3D;&gt; 低5位有效，标识寄存器地址</span><br><span class="line">[10:0 ]: xxx &#x3D;&gt; 11位，标识后面紧跟的32位数据个数</span><br></pre></td></tr></table></figure>
-<p>type2配置包格式：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[31:29]: 010 &#x3D;&gt; type2</span><br><span class="line">[28:27]: xx  &#x3D;&gt; OP code (00: NOP  01: Read  10: Write  11: Reserved)</span><br><span class="line">[26:0 ]: xxx &#x3D;&gt; 27位，标识后面紧跟的32位数据个数</span><br></pre></td></tr></table></figure>
-<p>注意：type2配置包只能跟着type1，主要是为了用于写大段数据时，因为type1数据长度字段只有11位，不能表示太长的数据，所以才多出这么个type2配置包。</p>
-<h2 id="4、配置寄存器列表"><a href="#4、配置寄存器列表" class="headerlink" title="4、配置寄存器列表"></a>4、配置寄存器列表</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(00)00000:  CRC     R&#x2F;W     &#x2F;&#x2F; CRC寄存器</span><br><span class="line">(01)00001:  FAR     R&#x2F;W     &#x2F;&#x2F; 帧地址寄存器</span><br><span class="line">(02)00010:  FDRI    WO      &#x2F;&#x2F; 写帧数据寄存器</span><br><span class="line">(03)00011:  FDRO    RO      &#x2F;&#x2F; 度帧数据寄存器</span><br><span class="line">(04)00100:  CMD     R&#x2F;W     &#x2F;&#x2F; 命令寄存器</span><br><span class="line">(05)00101:  CTL0    R&#x2F;W     &#x2F;&#x2F; 控制寄存器0</span><br><span class="line">(06)00110:  MASK    R&#x2F;W     &#x2F;&#x2F; 控制寄存器的MASK寄存器</span><br><span class="line">(07)00111:  STAT    RO      &#x2F;&#x2F; 状态寄存器</span><br><span class="line">(08)01000:  LOUT    WO      &#x2F;&#x2F; Legacy输出寄存器</span><br><span class="line">(09)01001:  COR0    R&#x2F;W     &#x2F;&#x2F; 配置寄存器0</span><br><span class="line">(0A)01010:  MFWR    WO      &#x2F;&#x2F; 多帧数据写寄存器</span><br><span class="line">(0B)01011:  CBC     WO      &#x2F;&#x2F; CBC值寄存器</span><br><span class="line">(0C)01100:  IDCODE  R&#x2F;W     &#x2F;&#x2F; 设备ID寄存器</span><br><span class="line">(0D)01101:  AXSS    R&#x2F;W     &#x2F;&#x2F; 用户寄存器</span><br><span class="line">(0E)01110:  COR1    R&#x2F;W     &#x2F;&#x2F; 配置寄存器1</span><br><span class="line">(10)10000:  WBSTAR  R&#x2F;W     &#x2F;&#x2F; 热跳转地址寄存器</span><br><span class="line">(11)10001:  TIMER   R&#x2F;W     &#x2F;&#x2F; 看门狗计时器</span><br><span class="line">(16)10110:  BOOTSTS RO      &#x2F;&#x2F; 启动历史状态寄存器</span><br><span class="line">(18)11000:  CTL1    R&#x2F;W     &#x2F;&#x2F; 控制寄存器1</span><br><span class="line">(1F)11111:  BSPI    R&#x2F;W     &#x2F;&#x2F; BPI&#x2F;SPI配置寄存器</span><br></pre></td></tr></table></figure>
-<p>下面我挑选一些常用寄存器的描述，如果想了解下面没描述到的寄存器，可以直接参考xilinx的ug470里面的内容：</p>
-<h3 id="4-1-FAR-帧地址寄存器详解"><a href="#4-1-FAR-帧地址寄存器详解" class="headerlink" title="4.1 FAR 帧地址寄存器详解"></a>4.1 FAR 帧地址寄存器详解</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[25:23]: 类型，000: CLB,I&#x2F;O,CLK  001: BRAM  010: CFG_CLB</span><br><span class="line">[22]:    0: 上半部分   1：下半部分</span><br><span class="line">[21:17]: 行地址</span><br><span class="line">[16:7]:  列地址</span><br><span class="line">[6:0]:   每列里面子地址</span><br></pre></td></tr></table></figure>
-
-<h3 id="4-2-CMD-命令寄存器详解"><a href="#4-2-CMD-命令寄存器详解" class="headerlink" title="4.2 CMD 命令寄存器详解"></a>4.2 CMD 命令寄存器详解</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00000:  NULL    &#x2F;&#x2F; 空命令</span><br><span class="line">00001:  WCFG    &#x2F;&#x2F; 写配置数据</span><br><span class="line">00010:  MFW     &#x2F;&#x2F; 写多帧数据</span><br><span class="line">00011:  DGHIGH  &#x2F;&#x2F; 最后一帧命令，用于释放内部的GHIGH_B信号</span><br><span class="line">00100:  RCFG    &#x2F;&#x2F; 读配置数据</span><br><span class="line">00101:  START   &#x2F;&#x2F; 启动Startup序列</span><br><span class="line">00110:  RCAP    &#x2F;&#x2F; 复位CAPTURE信号</span><br><span class="line">00111:  RCRC    &#x2F;&#x2F; 复位CRC值寄存器</span><br><span class="line">01000:  AGHIGH  &#x2F;&#x2F; 拉低内部GHIGH_B信号，用于将内部互联信号置为高阻，以免冲突</span><br><span class="line">01001:  SWITCH  &#x2F;&#x2F; 切换CCLK频率，CCLK频率具体值在COR0中配置</span><br><span class="line">01010:  GRESTORE&#x2F;&#x2F; 拉高GRESTORE信号，复位或置位IOB和CLB_FF</span><br><span class="line">01011:  SHUTDOWN&#x2F;&#x2F; 关闭序列</span><br><span class="line">01100:  GCAPTURE&#x2F;&#x2F; 拉高GCAPTURE信号</span><br><span class="line">01101:  DESYNC  &#x2F;&#x2F; 复位DALIGN信号，解同步指令</span><br><span class="line">01111:  IPROG   &#x2F;&#x2F; 内部PROG触发，Multiboot跳转</span><br><span class="line">10000:  CRCC    &#x2F;&#x2F; ！！！不晓得，没看懂！！！</span><br><span class="line">10001:  LTIMER  &#x2F;&#x2F; 重新Load看门狗</span><br><span class="line">10010:  BSPI_READ&#x2F;&#x2F; 重新读位流</span><br><span class="line">10011:  FALL_EDGE&#x2F;&#x2F; 下降沿采样</span><br></pre></td></tr></table></figure>
-
-<h3 id="4-3-CTL0-控制寄存器0"><a href="#4-3-CTL0-控制寄存器0" class="headerlink" title="4.3 CTL0 控制寄存器0"></a>4.3 CTL0 控制寄存器0</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[31]: EFUSE_KEY         &#x2F;&#x2F; AES key存哪里，0：电池BRAM  1：eFUSE</span><br><span class="line">[30]: ICAP_SELECT       &#x2F;&#x2F; 0：用上半部的ICAPE2  1：用下半部的ICAPE2</span><br><span class="line">[12]: OverTempPowerDown &#x2F;&#x2F; 超温关机功能 0：关闭  1：打开</span><br><span class="line">[10]: ConfigFallback    &#x2F;&#x2F; 回读功能 0：使能  1：不使能</span><br><span class="line">[8]: GLUTMASK_B         &#x2F;&#x2F; 可变内容是否回读 0：读  1：不读</span><br><span class="line">[7]: FARSRC             &#x2F;&#x2F; 没看懂</span><br><span class="line">[6]: DEC                &#x2F;&#x2F; AES解密 0：不使能 1：使能</span><br><span class="line">[5:4]: SBITS            &#x2F;&#x2F; 秘密等级  00：写读都可以 01：关闭读  1x：写读都关闭</span><br><span class="line">[3]: PERSIST            &#x2F;&#x2F; 是否保持配置专用管脚功能  0：不保留  1：保留</span><br><span class="line">[0]: GTS_USR_B          &#x2F;&#x2F; 三态IO是否上下拉  0：不拉 1：上拉</span><br></pre></td></tr></table></figure>
-
-<h3 id="4-5-STAT-状态寄存器"><a href="#4-5-STAT-状态寄存器" class="headerlink" title="4.5 STAT 状态寄存器"></a>4.5 STAT 状态寄存器</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[26:25]: BUS_WIDTH      &#x2F;&#x2F; 00：x1 </span><br><span class="line">                           01：x8 </span><br><span class="line">                           10：x16 </span><br><span class="line">                           11：x32</span><br><span class="line">[20:18]: STARTUP_STATE  &#x2F;&#x2F; Phase 0 &#x3D; 000</span><br><span class="line">                           Phase 1 &#x3D; 001</span><br><span class="line">                           Phase 2 &#x3D; 011</span><br><span class="line">                           Phase 3 &#x3D; 010</span><br><span class="line">                           Phase 4 &#x3D; 110</span><br><span class="line">                           Phase 5 &#x3D; 111</span><br><span class="line">                           Phase 6 &#x3D; 101</span><br><span class="line">                           Phase 7 &#x3D; 100</span><br><span class="line">[16]: DEC_ERROR         &#x2F;&#x2F; 0: No error 1: ERROR</span><br><span class="line">[15]: ID_ERROR          &#x2F;&#x2F; 0: No error 1: ERROR</span><br><span class="line">[14]: DONE              &#x2F;&#x2F; DONE管脚状态</span><br><span class="line">[13]: RELEASE_DONE      &#x2F;&#x2F; DONE管脚内部状态</span><br><span class="line">[12]: INITB             &#x2F;&#x2F; INITB管脚状态</span><br><span class="line">[11]: RELEASE_INITB     &#x2F;&#x2F; INITB管脚内部状态</span><br><span class="line">[10:8]: MODE            &#x2F;&#x2F; M[2:0]管脚状态</span><br><span class="line">[7]: GHIGH_B            &#x2F;&#x2F; GHIGH_B信号状态</span><br><span class="line">[6]: GWE                &#x2F;&#x2F; GWE信号状态</span><br><span class="line">[5]: GTS_CFG_B          &#x2F;&#x2F; GTS_CFG_B信号状态</span><br><span class="line">[4]: EOS                &#x2F;&#x2F; 启动序列是否完成</span><br><span class="line">[3]: DCI_MATCH          &#x2F;&#x2F; DCI_MATCH</span><br><span class="line">[2]: MMCM_LOCK          &#x2F;&#x2F; MMCM_LOCK</span><br><span class="line">[1]: PART_SECURED       &#x2F;&#x2F; PART_SECURED</span><br><span class="line">[0]: CRC_ERROR          &#x2F;&#x2F; CRC_ERROR</span><br></pre></td></tr></table></figure>
-
-<h3 id="4-6-COR0-配置寄存器0"><a href="#4-6-COR0-配置寄存器0" class="headerlink" title="4.6 COR0 配置寄存器0"></a>4.6 COR0 配置寄存器0</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[27]: PWRDWN_STAT       &#x2F;&#x2F; 改变DONE管脚功能为POWNDOWN</span><br><span class="line">[25]: DONE_PIPE         &#x2F;&#x2F; 是否寄存器一拍DONE信号</span><br><span class="line">[24]: DRIVE_DONE        &#x2F;&#x2F; 0：DONE信号开漏  1：DONE信号驱动</span><br><span class="line">[23]: SINGLE            &#x2F;&#x2F; 搞不懂</span><br><span class="line">[22:17]: OSCFSEL        &#x2F;&#x2F; CCLK频率，2M~60M</span><br><span class="line">[16:15]: SSCLKSRC       &#x2F;&#x2F; 00: CCLK  01:UserClk (per connection on the CAPTUREE2 block)  1x: JTAGClk</span><br><span class="line">[14:12]: DONE_CYCLE     &#x2F;&#x2F; DONE在哪个阶段起来</span><br><span class="line">                           000: Startup phase 1</span><br><span class="line">                           001: Startup phase 2</span><br><span class="line">                           010: Startup phase 3</span><br><span class="line">                           011: Startup phase 4</span><br><span class="line">                           100: Startup phase 5</span><br><span class="line">                           101: Startup phase 6</span><br><span class="line">                           111: Keep (not recommended)</span><br><span class="line">[11:9]: MATCH_CYCLE     &#x2F;&#x2F; DCI Match阶段</span><br><span class="line">[8:6]: LOCK_CYCLE       &#x2F;&#x2F; MMCK lock阶段</span><br><span class="line">[5:3]: GTS_CYCLE        &#x2F;&#x2F; GTS释放阶段</span><br><span class="line">[2:0]: GWE_CYCLE        &#x2F;&#x2F; GWE释放阶段</span><br></pre></td></tr></table></figure>
-
-<h3 id="4-7-COR1-配置寄存器1"><a href="#4-7-COR1-配置寄存器1" class="headerlink" title="4.7 COR1 配置寄存器1"></a>4.7 COR1 配置寄存器1</h3><p>这里省略了一些我没理清除的一些内容。。。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[3:2]: BPI_1ST_READ_CYCLE &#x2F;&#x2F; First byte read timing:</span><br><span class="line">                             00: 1 CCLK (default)</span><br><span class="line">                             01: 2 CCLKs</span><br><span class="line">                             10: 3 CCLKs</span><br><span class="line">                             11: 4 CCLKs</span><br><span class="line">[1:0]: BPI_PAGE_SIZE      &#x2F;&#x2F; Flash memory page size:</span><br><span class="line">                             00: 1 byte&#x2F;word (default)</span><br><span class="line">                             01: 4 bytes&#x2F;words</span><br><span class="line">                             10: 8 bytes&#x2F;words</span><br><span class="line">                             11: Reserved</span><br></pre></td></tr></table></figure>
-
-<h3 id="4-8-BPI配置寄存器"><a href="#4-8-BPI配置寄存器" class="headerlink" title="4.8 BPI配置寄存器"></a>4.8 BPI配置寄存器</h3><p><img src="https://s1.ax1x.com/2020/03/14/8lGyXF.png" alt="8lGyXF.png"></p>
-]]></content>
-      <categories>
-        <category>XILINX</category>
-        <category>Xilinx 7系列配置</category>
-      </categories>
-      <tags>
-        <tag>XILINX</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>(Xilinx-7系配置4) 配置加载流程</title>
-    <url>/posts/ea757907/</url>
-    <content><![CDATA[<p>尽管7系列fpga配置接口有多种多样，但内部流程都是一样的，如下图所示：<br><img src="https://s1.ax1x.com/2020/03/12/8mmWUs.png" alt="8mmWUs.png"></p>
-<ul>
-<li>设备上电</li>
-<li>清除配置</li>
-<li>采样配置模式</li>
-<li>查找同步</li>
-<li>设备ID检测</li>
-<li>加载配置位流</li>
-<li>CRC校验</li>
-<li>启动序列</li>
-</ul>
-<h3 id="阶段1-设备上电"><a href="#阶段1-设备上电" class="headerlink" title="阶段1. 设备上电"></a>阶段1. 设备上电</h3><p>FPGA的电源VCCO0、VCCAUX、VCCBRAM、VCCINT都需要正常上电，下面这些是配置需要的供电：<br><img src="https://s1.ax1x.com/2020/03/12/8mMKsK.png" alt="8mMKsK.png"></p>
-<p>上电时序如下：<br><img src="https://s1.ax1x.com/2020/03/12/8m1tzR.png" alt="8m1tzR.png"></p>
-<p>在fpga正常上电或配置后，可以通过拉低PROGRAM_B管脚重配置FPGA，时序如下：<br><img src="https://s1.ax1x.com/2020/03/12/8mGAIO.png" alt="8mGAIO.png"></p>
-<p>从上图可以看出，加载模式管脚是在INIT_B上升沿采样的。</p>
-<h3 id="阶段2-清除配置"><a href="#阶段2-清除配置" class="headerlink" title="阶段2. 清除配置"></a>阶段2. 清除配置</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mGRyR.png" alt="8mGRyR.png"><br>紧接着上电阶段、或者PROGRAM_B拉低后、或者JTAG发送JPROGRAM指令后、或者IPROG命令后、或者fallback发生后，开始进行配置区域清除操作。BRAM恢复到初始态，FF等通过GSR全局复位管脚复位。通过GTS信号，将IO管脚都置为高阻态，如果PUDC_B管脚为低，IO上会有一个上拉电阻使能。这时INIT_B由FPGA内部驱动拉低，等待时间TPOR后(参考前面时序图)释放INIT_B，INIT_B由外部上拉电阻拉高。如果外部强制把INIT_B拉低，也就是说不让INIT_B起来，就可以实现延迟启动的功能。</p>
-<h3 id="阶段3-采样配置模式"><a href="#阶段3-采样配置模式" class="headerlink" title="阶段3. 采样配置模式"></a>阶段3. 采样配置模式</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mt9Mj.png" alt="8mt9Mj.png"><br>当INIT_B上升沿发生，FPGA采样M[2:0]配置管脚，如果是Master模式就驱动CCLK输出，对于BPI或者SelectMap模式，这时内部状态是x8模式，这个模式会持续到位宽检测那个时刻。</p>
-<h3 id="阶段4-查找同步"><a href="#阶段4-查找同步" class="headerlink" title="阶段4. 查找同步"></a>阶段4. 查找同步</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mtbpF.png" alt="8mtbpF.png"><br>基于上一步采样的模式，接下来就开始读取配置数据了，配置数据的头部，都含有用于判断位宽的数据，位宽判断方法请参考我另外一篇博文：<a href="https://www.cdutcl.com/posts/60ffd69e/">位流位宽检测机理</a>，当总线位宽确定后，就按照真实位宽查找配置数据中的同步头数据(0xAA995566)。</p>
-<h3 id="阶段5-设备ID检测"><a href="#阶段5-设备ID检测" class="headerlink" title="阶段5. 设备ID检测"></a>阶段5. 设备ID检测</h3><p><img src="https://s1.ax1x.com/2020/03/12/8maFeA.png" alt="8maFeA.png"><br>当找到同步头以后，需要判断ID后才能加载后面的位流，这样可以避免器件不匹配的错误。7系列的ID格式如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vvvv:fffffff:aaaaaaaaa:ccccccccccc1</span><br><span class="line"></span><br><span class="line">v: 4bit, version</span><br><span class="line">f: 7bit, family code</span><br><span class="line">a: 9bit, array code(4bit sub-family and 5bit device code)</span><br><span class="line">c: company code</span><br></pre></td></tr></table></figure>
-
-<h3 id="阶段6-加载配置位流"><a href="#阶段6-加载配置位流" class="headerlink" title="阶段6. 加载配置位流"></a>阶段6. 加载配置位流</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mdM9K.png" alt="8mdM9K.png"><br>经过上述的同步字、ID检测后，接下来就是按照数据帧配置FPGA了。具体帧结构，等后面有时间写另外一篇博文来说明。</p>
-<h3 id="阶段7-CRC校验"><a href="#阶段7-CRC校验" class="headerlink" title="阶段7. CRC校验"></a>阶段7. CRC校验</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mdf3T.png" alt="8mdf3T.png"><br>在加载数据帧时，FPGA会基于这些数据帧算出了一个CRC值，当所有的帧都加载完成以后，得到一个最终CRC，位流的尾部会有一个CRC期待值以及CRC检测指令。如果CRC检测不一致，FPGA会拉低INIT_B信号以表示CRC错误，然后中断配置流程。</p>
-<h3 id="阶段8-启动序列"><a href="#阶段8-启动序列" class="headerlink" title="阶段8. 启动序列"></a>阶段8. 启动序列</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mBM90.png" alt="8mBM90.png"><br>通过前面的步骤，已经将配置位流正确的加载到了FPGA内部。这一步是FPGA的一个启动过程，又分为8个小的步骤(phases 0-7)：<br><img src="https://s1.ax1x.com/2020/03/12/8mBcEd.png" alt="8mBcEd.png"><br>当这几个步骤完成后，FPGA释放DONE信号，DONE信号由外部上拉电阻拉高。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>整体过程如下图所示：<br><img src="https://s1.ax1x.com/2020/03/12/8mDDGq.png" alt="8mDDGq.png"></p>
-<hr>
-]]></content>
-      <categories>
-        <category>XILINX</category>
-        <category>Xilinx 7系列配置</category>
-      </categories>
-      <tags>
-        <tag>XILINX</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>(Xilinx-7系配置3) bit swapping功能描述</title>
-    <url>/posts/2cc4f630/</url>
-    <content><![CDATA[<h2 id="1、位交换功能"><a href="#1、位交换功能" class="headerlink" title="1、位交换功能"></a>1、位交换功能</h2><p>xilinx位交换功能，主要是用在生成并行PROM配置文件的时候使用。生成spi的配置文件时，是不需要该功能的，而生成并行MCS时，默认是打开该功能的。</p>
-<h2 id="2、功能详细描述"><a href="#2、功能详细描述" class="headerlink" title="2、功能详细描述"></a>2、功能详细描述</h2><p>位交换功能仅仅对字节操作，仅仅将byte数据高低位颠倒，如图所示：<br><img src="https://s1.ax1x.com/2020/03/12/8m9Mb6.png" alt="8m9Mb6.png"></p>
-<h2 id="3、数据配置"><a href="#3、数据配置" class="headerlink" title="3、数据配置"></a>3、数据配置</h2><h3 id="3-1、8位并行模式"><a href="#3-1、8位并行模式" class="headerlink" title="3.1、8位并行模式"></a>3.1、8位并行模式</h3><p>拿同步字来举例，生成的bit位流中，原始同步数据和swap后数据如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">AA 99 55 66  </span><br><span class="line"> |  |  |  |</span><br><span class="line"> V  V  V  V</span><br><span class="line">55 99 AA 66</span><br></pre></td></tr></table></figure>
-<p>假设配置总线是D[7:0]，按字节将数据传递到总线中，比如: </p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">AA(10101010) &#x3D;&gt; 字节的MSB接D0 &#x3D;&gt; D[0:7](10101010) &#x3D;&gt; D[7:0](01010101)55</span><br></pre></td></tr></table></figure>
-<p>所以，我们本来是要传递数据AA，到D[7:0]总线上数据变成了55。</p>
-<h3 id="3-2、16位并行模式"><a href="#3-2、16位并行模式" class="headerlink" title="3.2、16位并行模式"></a>3.2、16位并行模式</h3><p>基于上述的8位模式，如果总线是16位，那么每个周期就传递2个字节，这里的规则是，先来的字节放在高位，流程如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-&gt; AA -&gt; 99 -&gt; 55 -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 55 -&gt; 99 -&gt; AA -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 5599 -&gt; AA66 -&gt;</span><br></pre></td></tr></table></figure>
-<p>所以，16位总线D[15:0]上数据流就是：5599 -&gt; AA66  </p>
-<h3 id="3-3、32位并行模式"><a href="#3-3、32位并行模式" class="headerlink" title="3.3、32位并行模式"></a>3.3、32位并行模式</h3><p>有了上述16位总线的规律，这个32位就好理解了：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-&gt; AA -&gt; 99 -&gt; 55 -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 55 -&gt; 99 -&gt; AA -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 5599AA66 -&gt;</span><br></pre></td></tr></table></figure>
-<p>所以，32位总线D[31:0]上数据流就是：5599AA66  </p>
-<h2 id="4、软件配置"><a href="#4、软件配置" class="headerlink" title="4、软件配置"></a>4、软件配置</h2><p>有了上述原理，我们就可以通过CPU读取BIN文件，然后通过并口配置fpga。<br>这里就可以根据CPU取数的大小端方式，然后按照顺序配置FPGA即可。</p>
-<hr>
-]]></content>
-      <categories>
-        <category>XILINX</category>
-        <category>Xilinx 7系列配置</category>
-      </categories>
-      <tags>
-        <tag>XILINX</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>VIM笔记-中文乱码问题</title>
     <url>/posts/ed91337d/</url>
     <content><![CDATA[<p>由于工作需要，可能经常需要在Windows和Linux两个环境中切换。Vim乱码一直是让我头疼的一个事情，网上描述该问题的文章有很多，但都是直接说怎么做的，没有讲清楚其中的原理，所以整理这篇文章，希望能把该问题彻底解释清楚：  </p>
+<a id="more"></a>
+
 <h2 id="1-默认编码"><a href="#1-默认编码" class="headerlink" title="1. 默认编码"></a>1. 默认编码</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Windows中默认的文本编码是cp936，而Linux一般都是utf-8</span><br></pre></td></tr></table></figure>
 
 <h2 id="2-查看文件编码"><a href="#2-查看文件编码" class="headerlink" title="2. 查看文件编码"></a>2. 查看文件编码</h2><p>当你打开一个文本后，你可以在vim中输入下面命令查看文本编码：</p>
@@ -132,50 +32,11 @@
       </tags>
   </entry>
   <entry>
-    <title>(Xilinx-7系配置2) 位流位宽检测机理</title>
-    <url>/posts/60ffd69e/</url>
-    <content><![CDATA[<h2 id="位宽检测"><a href="#位宽检测" class="headerlink" title="位宽检测"></a>位宽检测</h2><p>每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。<br>检测机理如下：<br><img src="https://s1.ax1x.com/2020/03/12/8ZMWQK.png" alt="8ZMWQK.png"><br>如上图所示：<br>上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了：</p>
-<h3 id="1-8位模式判断"><a href="#1-8位模式判断" class="headerlink" title="1. 8位模式判断"></a>1. 8位模式判断</h3><p>数据按字节输入：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00-&gt;00-&gt;00-&gt;BB-&gt;11-&gt;22-&gt;00-&gt;44-&gt;</span><br></pre></td></tr></table></figure>
-<p>判断到BB后紧跟着11，说明总线是8位宽度；</p>
-<h3 id="2-16位模式判断"><a href="#2-16位模式判断" class="headerlink" title="2. 16位模式判断"></a>2. 16位模式判断</h3><p>数据按双字节输入：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0000-&gt;00BB-&gt;1122-&gt;0044-&gt;</span><br></pre></td></tr></table></figure>
-<p>低8位中，BB后紧跟着22，说明总线是16位宽度；</p>
-<h3 id="3-32位模式判断"><a href="#3-32位模式判断" class="headerlink" title="3. 32位模式判断"></a>3. 32位模式判断</h3><p>数据按四字节输入：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">000000BB-&gt;11220044-&gt;</span><br></pre></td></tr></table></figure>
-<p>低8位中，BB后紧跟着44，说明总线是32位宽度；</p>
-<p>根据如上机理，即可判断总线宽度。</p>
-<hr>
-]]></content>
-      <categories>
-        <category>XILINX</category>
-        <category>Xilinx 7系列配置</category>
-      </categories>
-      <tags>
-        <tag>XILINX</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>(Xilinx-7系配置1) 数据文件格式</title>
-    <url>/posts/df2d2b3/</url>
-    <content><![CDATA[<h2 id="配置文件后缀"><a href="#配置文件后缀" class="headerlink" title="配置文件后缀"></a>配置文件后缀</h2><h3 id="1-bit格式"><a href="#1-bit格式" class="headerlink" title="1. bit格式"></a>1. bit格式</h3><p>默认生成文件类型，包含一些冗余的头部信息，这些头部信息是不需要下载到FPGA里面的。bit文件可以直接通过jtag加载到fpga中，掉电消失。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMmGt.png" alt="8ZMmGt.png"></p>
-<h3 id="2-rbt格式"><a href="#2-rbt格式" class="headerlink" title="2. rbt格式"></a>2. rbt格式</h3><p>在ISE中使能了-b选项、在vivado中使能了-raw_bitfile选项，就可以生成该文件，该文件内容和bit一致，只是说这个是ASCII格式，bit是bin格式。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMePI.png" alt="8ZMePI.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMVIA.png" alt="8ZMVIA.png"></p>
-<h3 id="3-bin格式"><a href="#3-bin格式" class="headerlink" title="3. bin格式"></a>3. bin格式</h3><p>在ISE中使能了-g binary:yes选项、在vivado中使能了-bin_file选项，就可以生成该文件，该文件内容相当于bit文件剔除了头部冗余信息。后面完全一致。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMAVH.png" alt="8ZMAVH.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMEad.png" alt="8ZMEad.png"></p>
-<h3 id="4-mcs格式"><a href="#4-mcs格式" class="headerlink" title="4. mcs格式"></a>4. mcs格式</h3><p>在vivado中，使用write_cfgmem -format mcs命令可以将bit文件转换成mcs文件，mcs文件也是ASCII格式，可以直接用文本工具打开，主要是在bin的基础上，增加了地址信息和校验信息。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMnRP.png" alt="8ZMnRP.png"></p>
-<hr>
-]]></content>
-      <categories>
-        <category>XILINX</category>
-        <category>Xilinx 7系列配置</category>
-      </categories>
-      <tags>
-        <tag>XILINX</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Ubuntu18.04安装中文支持</title>
     <url>/posts/87fd19ae/</url>
-    <content><![CDATA[<p>原文链接：<a href="https://blog.csdn.net/AsynSpace/article/details/86293500" target="_blank" rel="noopener">https://blog.csdn.net/AsynSpace/article/details/86293500</a></p>
+    <content><![CDATA[<p>本来主要描述Ubuntu18.04系统中，安装中文支持的方法，内容主要参考网络文章，自己尝试后编辑成文。</p>
+<a id="more"></a>
+<p>原文链接：<a href="https://blog.csdn.net/AsynSpace/article/details/86293500" target="_blank" rel="noopener">https://blog.csdn.net/AsynSpace/article/details/86293500</a></p>
 <p>安装之前，执行</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$LANG</span></span><br></pre></td></tr></table></figure>
 <p>查看语言环境  </p>
@@ -204,48 +65,6 @@
       <tags>
         <tag>LINUX</tag>
         <tag>Ubuntu</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Zynq外设之--地址空间</title>
-    <url>/posts/33b86a6d/</url>
-    <content><![CDATA[<p>Zynq系列器件，系统空间分布如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1soQ.png" alt="8Z1soQ.png"></p>
-<p>其中，PS端的IO外设挂在32位APB总线下，地址分布如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1rdg.png" alt="8Z1rdg.png"></p>
-<p>SMC地址空间如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z10L8.png" alt="8Z10L8.png"></p>
-<p>PS系统空间分布如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1wsf.png" alt="8Z1wsf.png"></p>
-<hr>
-]]></content>
-      <categories>
-        <category>XILINX</category>
-      </categories>
-      <tags>
-        <tag>XILINX</tag>
-        <tag>ZYNQ</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Zynq外设之--GPIO</title>
-    <url>/posts/21e5acfb/</url>
-    <content><![CDATA[<p>本文内容主要来自官方手册ug585，根据个人理解整理成文。</p>
-<hr>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Zynq的GPIO外设可以控制54个MIO，以及通过EMIO和PL交互的64个input、128个output。然后，这些IO分别分配到了4个BANK的GPIO控制器上。每个IO可以相互独立的配置为input、output、中断。</p>
-<h2 id="框图"><a href="#框图" class="headerlink" title="框图"></a>框图</h2><p><img src="https://s1.ax1x.com/2020/03/12/8Z1WQ0.png" alt="8Z1WQ0.png"></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Bank0:  MIO[31:0]</span><br><span class="line">Bank1:  MIO[53:32]</span><br><span class="line">Bank2:  EMIO[31:0]</span><br><span class="line">Bank3:  EMIO[63:32]</span><br></pre></td></tr></table></figure>
-
-<h2 id="功能描述"><a href="#功能描述" class="headerlink" title="功能描述"></a>功能描述</h2><p>下面是一个GPIO通道的功能框图：<br><img src="https://s1.ax1x.com/2020/03/12/8Z12zq.png" alt="8Z12zq.png"></p>
-<h2 id="例外情况"><a href="#例外情况" class="headerlink" title="例外情况"></a>例外情况</h2><p>MIO[8:7]：这两个脚是用来表示BANK电压的。</p>
-<h2 id="系统功能"><a href="#系统功能" class="headerlink" title="系统功能"></a>系统功能</h2><ul>
-<li>GPIO外设的中断号是52</li>
-<li>时钟采用CPU_1x</li>
-</ul>
-<hr>
-]]></content>
-      <categories>
-        <category>XILINX</category>
-      </categories>
-      <tags>
-        <tag>XILINX</tag>
-        <tag>ZYNQ</tag>
       </tags>
   </entry>
   <entry>
@@ -315,33 +134,6 @@
       </categories>
       <tags>
         <tag>XILINX</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Zynq电源设计注意事项</title>
-    <url>/posts/5b72433c/</url>
-    <content><![CDATA[<p>本文内容主要来自Xilinx官方手册ds191，描述在使用Xilinx Zynq芯片时，电源设计需要考虑的地方。    </p>
-<hr>
-<h2 id="1-背景介绍"><a href="#1-背景介绍" class="headerlink" title="1. 背景介绍"></a>1. 背景介绍</h2><p>Xilinx Zynq系列芯片，分为PS和PL两个大的部分，他们电源分别独立。所以供电时可以单独考虑。</p>
-<h2 id="2-电源汇总"><a href="#2-电源汇总" class="headerlink" title="2. 电源汇总"></a>2. 电源汇总</h2><h3 id="2-1-PS部分需要供电如下："><a href="#2-1-PS部分需要供电如下：" class="headerlink" title="2.1 PS部分需要供电如下："></a>2.1 PS部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">VCCPINT:  1.0V  </span><br><span class="line">VCCPAUX:  1.8V  </span><br><span class="line">VCCPLL:   1.8V  </span><br><span class="line">VCCO_DDR: 1.14V~1.89V  </span><br><span class="line">VCCO_MIO: 1.71V~3.465V</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-2-PL部分需要供电如下："><a href="#2-2-PL部分需要供电如下：" class="headerlink" title="2.2 PL部分需要供电如下："></a>2.2 PL部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">VCCINT:   1.0V  </span><br><span class="line">VCCBRAM:  1.0V  </span><br><span class="line">VCCAUX:   1.8V  </span><br><span class="line">VCCO:     1.14V~3.465V(HR)  1.14V~1.89V(HP)  </span><br><span class="line">VCCAUX_IO: 1.8V&#x2F;2.0V</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-3-GT部分需要供电如下："><a href="#2-3-GT部分需要供电如下：" class="headerlink" title="2.3 GT部分需要供电如下："></a>2.3 GT部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">VMGTAVCC: 1.0V(&lt;&#x3D;10.3125GHz) 1.05V(&gt;10.3125GHz) </span><br><span class="line">VMGTAVTT: 1.2V  </span><br><span class="line">VMGTVCCAUX: 1.8V</span><br><span class="line">VMGTAVTTRCAL: 1.2V</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-4-XADC部分需要供电如下："><a href="#2-4-XADC部分需要供电如下：" class="headerlink" title="2.4 XADC部分需要供电如下："></a>2.4 XADC部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">VCCADC:   1.8V</span><br><span class="line">VREFP:    1.25V</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-上下电时序"><a href="#3-上下电时序" class="headerlink" title="3. 上下电时序"></a>3. 上下电时序</h2><h3 id="3-1-PS部分上下电时序"><a href="#3-1-PS部分上下电时序" class="headerlink" title="3.1 PS部分上下电时序"></a>3.1 PS部分上下电时序</h3><p>上电：VCCPINT -&gt; VCCPAUX &amp; VCCPLL -&gt; VCCO(MIO0,MIO1,DDR)<br>下电：和上面相反。  </p>
-<h3 id="3-2-PL部分上下电时序"><a href="#3-2-PL部分上下电时序" class="headerlink" title="3.2 PL部分上下电时序"></a>3.2 PL部分上下电时序</h3><p>上电：VCCINT -&gt; VCCBRAM -&gt; VCCAUX -&gt; VCCAUX_IO -&gt; VCCO<br>下电：和上面相反。   </p>
-<h2 id="4-电源斜坡"><a href="#4-电源斜坡" class="headerlink" title="4. 电源斜坡"></a>4. 电源斜坡</h2><p>所有的电源斜坡：0.2ms ~ 50ms</p>
-<hr>
-]]></content>
-      <categories>
-        <category>XILINX</category>
-      </categories>
-      <tags>
-        <tag>XILINX</tag>
-        <tag>ZYNQ</tag>
       </tags>
   </entry>
   <entry>
@@ -538,6 +330,232 @@ make EXT_DTB=device_tree/system.dtb</code></pre>
 ]]></content>
       <categories>
         <category>XILINX</category>
+      </categories>
+      <tags>
+        <tag>XILINX</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Zynq电源设计注意事项</title>
+    <url>/posts/5b72433c/</url>
+    <content><![CDATA[<p>本文内容主要来自Xilinx官方手册ds191，描述在使用Xilinx Zynq芯片时，电源设计需要考虑的地方。    </p>
+<a id="more"></a>
+
+<hr>
+<h2 id="1-背景介绍"><a href="#1-背景介绍" class="headerlink" title="1. 背景介绍"></a>1. 背景介绍</h2><p>Xilinx Zynq系列芯片，分为PS和PL两个大的部分，他们电源分别独立。所以供电时可以单独考虑。</p>
+<h2 id="2-电源汇总"><a href="#2-电源汇总" class="headerlink" title="2. 电源汇总"></a>2. 电源汇总</h2><h3 id="2-1-PS部分需要供电如下："><a href="#2-1-PS部分需要供电如下：" class="headerlink" title="2.1 PS部分需要供电如下："></a>2.1 PS部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">VCCPINT:  1.0V  </span><br><span class="line">VCCPAUX:  1.8V  </span><br><span class="line">VCCPLL:   1.8V  </span><br><span class="line">VCCO_DDR: 1.14V~1.89V  </span><br><span class="line">VCCO_MIO: 1.71V~3.465V</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-PL部分需要供电如下："><a href="#2-2-PL部分需要供电如下：" class="headerlink" title="2.2 PL部分需要供电如下："></a>2.2 PL部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">VCCINT:   1.0V  </span><br><span class="line">VCCBRAM:  1.0V  </span><br><span class="line">VCCAUX:   1.8V  </span><br><span class="line">VCCO:     1.14V~3.465V(HR)  1.14V~1.89V(HP)  </span><br><span class="line">VCCAUX_IO: 1.8V&#x2F;2.0V</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-GT部分需要供电如下："><a href="#2-3-GT部分需要供电如下：" class="headerlink" title="2.3 GT部分需要供电如下："></a>2.3 GT部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">VMGTAVCC: 1.0V(&lt;&#x3D;10.3125GHz) 1.05V(&gt;10.3125GHz) </span><br><span class="line">VMGTAVTT: 1.2V  </span><br><span class="line">VMGTVCCAUX: 1.8V</span><br><span class="line">VMGTAVTTRCAL: 1.2V</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-4-XADC部分需要供电如下："><a href="#2-4-XADC部分需要供电如下：" class="headerlink" title="2.4 XADC部分需要供电如下："></a>2.4 XADC部分需要供电如下：</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">VCCADC:   1.8V</span><br><span class="line">VREFP:    1.25V</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-上下电时序"><a href="#3-上下电时序" class="headerlink" title="3. 上下电时序"></a>3. 上下电时序</h2><h3 id="3-1-PS部分上下电时序"><a href="#3-1-PS部分上下电时序" class="headerlink" title="3.1 PS部分上下电时序"></a>3.1 PS部分上下电时序</h3><p>上电：VCCPINT -&gt; VCCPAUX &amp; VCCPLL -&gt; VCCO(MIO0,MIO1,DDR)<br>下电：和上面相反。  </p>
+<h3 id="3-2-PL部分上下电时序"><a href="#3-2-PL部分上下电时序" class="headerlink" title="3.2 PL部分上下电时序"></a>3.2 PL部分上下电时序</h3><p>上电：VCCINT -&gt; VCCBRAM -&gt; VCCAUX -&gt; VCCAUX_IO -&gt; VCCO<br>下电：和上面相反。   </p>
+<h2 id="4-电源斜坡"><a href="#4-电源斜坡" class="headerlink" title="4. 电源斜坡"></a>4. 电源斜坡</h2><p>所有的电源斜坡：0.2ms ~ 50ms</p>
+<hr>
+]]></content>
+      <categories>
+        <category>XILINX</category>
+      </categories>
+      <tags>
+        <tag>XILINX</tag>
+        <tag>ZYNQ</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Zynq外设之--地址空间</title>
+    <url>/posts/33b86a6d/</url>
+    <content><![CDATA[<p>本文主要描述xilinx zynq7000系列的地址空间分布。</p>
+<a id="more"></a>
+
+<p>Zynq系列器件，系统空间分布如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1soQ.png" alt="8Z1soQ.png"></p>
+<p>其中，PS端的IO外设挂在32位APB总线下，地址分布如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1rdg.png" alt="8Z1rdg.png"></p>
+<p>SMC地址空间如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z10L8.png" alt="8Z10L8.png"></p>
+<p>PS系统空间分布如下：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1wsf.png" alt="8Z1wsf.png"></p>
+<hr>
+]]></content>
+      <categories>
+        <category>XILINX</category>
+      </categories>
+      <tags>
+        <tag>XILINX</tag>
+        <tag>ZYNQ</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Zynq外设之--GPIO</title>
+    <url>/posts/21e5acfb/</url>
+    <content><![CDATA[<p>本文内容主要来自官方手册ug585，根据个人理解整理成文。</p>
+<a id="more"></a>
+
+<hr>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Zynq的GPIO外设可以控制54个MIO，以及通过EMIO和PL交互的64个input、128个output。然后，这些IO分别分配到了4个BANK的GPIO控制器上。每个IO可以相互独立的配置为input、output、中断。</p>
+<h2 id="框图"><a href="#框图" class="headerlink" title="框图"></a>框图</h2><p><img src="https://s1.ax1x.com/2020/03/12/8Z1WQ0.png" alt="8Z1WQ0.png"></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Bank0:  MIO[31:0]</span><br><span class="line">Bank1:  MIO[53:32]</span><br><span class="line">Bank2:  EMIO[31:0]</span><br><span class="line">Bank3:  EMIO[63:32]</span><br></pre></td></tr></table></figure>
+
+<h2 id="功能描述"><a href="#功能描述" class="headerlink" title="功能描述"></a>功能描述</h2><p>下面是一个GPIO通道的功能框图：<br><img src="https://s1.ax1x.com/2020/03/12/8Z12zq.png" alt="8Z12zq.png"></p>
+<h2 id="例外情况"><a href="#例外情况" class="headerlink" title="例外情况"></a>例外情况</h2><p>MIO[8:7]：这两个脚是用来表示BANK电压的。</p>
+<h2 id="系统功能"><a href="#系统功能" class="headerlink" title="系统功能"></a>系统功能</h2><ul>
+<li>GPIO外设的中断号是52</li>
+<li>时钟采用CPU_1x</li>
+</ul>
+<hr>
+]]></content>
+      <categories>
+        <category>XILINX</category>
+      </categories>
+      <tags>
+        <tag>XILINX</tag>
+        <tag>ZYNQ</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>(Xilinx-7系配置5) 配置bit位流格式</title>
+    <url>/posts/bded59c/</url>
+    <content><![CDATA[<p>7系列FPGA的配置位流bit，头部开始有一些冗余的基本信息：比如bit的生成时间、生成工具的版本、top名称等信息。这些信息仅仅用于标识bit文件本身，不会下载到fpga或配置flash中。除去这些信息以外，其他剩下的就是下载到fpga、或flash中的数据。也就是bin文件的内容。</p>
+<a id="more"></a>
+<h2 id="1、配置数据构成"><a href="#1、配置数据构成" class="headerlink" title="1、配置数据构成"></a>1、配置数据构成</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据1</span><br><span class="line">...</span><br><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据8</span><br><span class="line">000000BB    &#x2F;&#x2F; 总线位宽检测字1</span><br><span class="line">11220044    &#x2F;&#x2F; 总线位宽检测字2</span><br><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据</span><br><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据</span><br><span class="line">AA995566    &#x2F;&#x2F; 同步字</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">30022001    &#x2F;&#x2F; Packet Type 1: 写TIMER寄存器，WORD_COUNT&#x3D;1  # 具体格式在后面描述</span><br><span class="line">00000000    &#x2F;&#x2F; TIMER[31:0]&#x3D;00000000(hex)</span><br><span class="line">...         &#x2F;&#x2F; 具体内容可以去ug470查，我这里就不搬过来了。</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">...         &#x2F;&#x2F; NOOP数据</span><br><span class="line">30002001    &#x2F;&#x2F; Packet Type 1: 写FAR寄存器，WORD_COUNT&#x3D;1</span><br><span class="line">00000000    &#x2F;&#x2F; 写Frame地址为0</span><br><span class="line">30002001    &#x2F;&#x2F; Packet Type 1: 写CMD寄存器，WORD_COUNT&#x3D;1</span><br><span class="line">00000001    &#x2F;&#x2F; 00001 写配置数据命令</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">30004000    &#x2F;&#x2F; Packet Type 1: 写FDRI寄存器，WORD_COUNT&#x3D;0</span><br><span class="line">502BA520    &#x2F;&#x2F; Packet Type 2: 写FDRI寄存器，WORD_COUNT&#x3D;2860320</span><br><span class="line">00000000    &#x2F;&#x2F; 数据字1，之前都是配置寄存那些，从这里开始就是真正配置FPGA内部的配置数据，一帧一帧组合在一起</span><br><span class="line">...         &#x2F;&#x2F; 数据字N</span><br><span class="line">00000000    &#x2F;&#x2F; 数据字2860320( 101字&#x2F;帧 x 28320帧)</span><br><span class="line">30000001    &#x2F;&#x2F; Packet Type 1: 写CRC寄存器，WORD_COUNT&#x3D;1</span><br><span class="line">????????    &#x2F;&#x2F; 写CRC值，如果值和FPGA内部计算出来不一致，就进入错误态。</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">...         &#x2F;&#x2F; 然后又操作几个寄存器，比如释放同步信号等。</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">...         &#x2F;&#x2F; NOOP数据</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br></pre></td></tr></table></figure>
+
+<h2 id="2、配置数据帧"><a href="#2、配置数据帧" class="headerlink" title="2、配置数据帧"></a>2、配置数据帧</h2><p>如上述格式描述所示，bit其实就是由一些头部功能字段+配置寄存器字段+真实配置数据帧+收尾配置寄存器这几部分组成。7系列的配置数据由N个配置数据帧组成，每个帧由101个32位数据组成。</p>
+<h2 id="3、配置包格式"><a href="#3、配置包格式" class="headerlink" title="3、配置包格式"></a>3、配置包格式</h2><p>如上述格式描述所示，配置FPGA寄存器的操作是由配置包的形式，包格式有两种：type1和type2。<br>type1配置包格式：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[31:29]: 001 &#x3D;&gt; type1</span><br><span class="line">[28:27]: xx  &#x3D;&gt; OP code (00: NOP  01: Read  10: Write  11: Reserved)</span><br><span class="line">[26:13]: xxx &#x3D;&gt; 低5位有效，标识寄存器地址</span><br><span class="line">[10:0 ]: xxx &#x3D;&gt; 11位，标识后面紧跟的32位数据个数</span><br></pre></td></tr></table></figure>
+<p>type2配置包格式：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[31:29]: 010 &#x3D;&gt; type2</span><br><span class="line">[28:27]: xx  &#x3D;&gt; OP code (00: NOP  01: Read  10: Write  11: Reserved)</span><br><span class="line">[26:0 ]: xxx &#x3D;&gt; 27位，标识后面紧跟的32位数据个数</span><br></pre></td></tr></table></figure>
+<p>注意：type2配置包只能跟着type1，主要是为了用于写大段数据时，因为type1数据长度字段只有11位，不能表示太长的数据，所以才多出这么个type2配置包。</p>
+<h2 id="4、配置寄存器列表"><a href="#4、配置寄存器列表" class="headerlink" title="4、配置寄存器列表"></a>4、配置寄存器列表</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(00)00000:  CRC     R&#x2F;W     &#x2F;&#x2F; CRC寄存器</span><br><span class="line">(01)00001:  FAR     R&#x2F;W     &#x2F;&#x2F; 帧地址寄存器</span><br><span class="line">(02)00010:  FDRI    WO      &#x2F;&#x2F; 写帧数据寄存器</span><br><span class="line">(03)00011:  FDRO    RO      &#x2F;&#x2F; 度帧数据寄存器</span><br><span class="line">(04)00100:  CMD     R&#x2F;W     &#x2F;&#x2F; 命令寄存器</span><br><span class="line">(05)00101:  CTL0    R&#x2F;W     &#x2F;&#x2F; 控制寄存器0</span><br><span class="line">(06)00110:  MASK    R&#x2F;W     &#x2F;&#x2F; 控制寄存器的MASK寄存器</span><br><span class="line">(07)00111:  STAT    RO      &#x2F;&#x2F; 状态寄存器</span><br><span class="line">(08)01000:  LOUT    WO      &#x2F;&#x2F; Legacy输出寄存器</span><br><span class="line">(09)01001:  COR0    R&#x2F;W     &#x2F;&#x2F; 配置寄存器0</span><br><span class="line">(0A)01010:  MFWR    WO      &#x2F;&#x2F; 多帧数据写寄存器</span><br><span class="line">(0B)01011:  CBC     WO      &#x2F;&#x2F; CBC值寄存器</span><br><span class="line">(0C)01100:  IDCODE  R&#x2F;W     &#x2F;&#x2F; 设备ID寄存器</span><br><span class="line">(0D)01101:  AXSS    R&#x2F;W     &#x2F;&#x2F; 用户寄存器</span><br><span class="line">(0E)01110:  COR1    R&#x2F;W     &#x2F;&#x2F; 配置寄存器1</span><br><span class="line">(10)10000:  WBSTAR  R&#x2F;W     &#x2F;&#x2F; 热跳转地址寄存器</span><br><span class="line">(11)10001:  TIMER   R&#x2F;W     &#x2F;&#x2F; 看门狗计时器</span><br><span class="line">(16)10110:  BOOTSTS RO      &#x2F;&#x2F; 启动历史状态寄存器</span><br><span class="line">(18)11000:  CTL1    R&#x2F;W     &#x2F;&#x2F; 控制寄存器1</span><br><span class="line">(1F)11111:  BSPI    R&#x2F;W     &#x2F;&#x2F; BPI&#x2F;SPI配置寄存器</span><br></pre></td></tr></table></figure>
+<p>下面我挑选一些常用寄存器的描述，如果想了解下面没描述到的寄存器，可以直接参考xilinx的ug470里面的内容：</p>
+<h3 id="4-1-FAR-帧地址寄存器详解"><a href="#4-1-FAR-帧地址寄存器详解" class="headerlink" title="4.1 FAR 帧地址寄存器详解"></a>4.1 FAR 帧地址寄存器详解</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[25:23]: 类型，000: CLB,I&#x2F;O,CLK  001: BRAM  010: CFG_CLB</span><br><span class="line">[22]:    0: 上半部分   1：下半部分</span><br><span class="line">[21:17]: 行地址</span><br><span class="line">[16:7]:  列地址</span><br><span class="line">[6:0]:   每列里面子地址</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-CMD-命令寄存器详解"><a href="#4-2-CMD-命令寄存器详解" class="headerlink" title="4.2 CMD 命令寄存器详解"></a>4.2 CMD 命令寄存器详解</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00000:  NULL    &#x2F;&#x2F; 空命令</span><br><span class="line">00001:  WCFG    &#x2F;&#x2F; 写配置数据</span><br><span class="line">00010:  MFW     &#x2F;&#x2F; 写多帧数据</span><br><span class="line">00011:  DGHIGH  &#x2F;&#x2F; 最后一帧命令，用于释放内部的GHIGH_B信号</span><br><span class="line">00100:  RCFG    &#x2F;&#x2F; 读配置数据</span><br><span class="line">00101:  START   &#x2F;&#x2F; 启动Startup序列</span><br><span class="line">00110:  RCAP    &#x2F;&#x2F; 复位CAPTURE信号</span><br><span class="line">00111:  RCRC    &#x2F;&#x2F; 复位CRC值寄存器</span><br><span class="line">01000:  AGHIGH  &#x2F;&#x2F; 拉低内部GHIGH_B信号，用于将内部互联信号置为高阻，以免冲突</span><br><span class="line">01001:  SWITCH  &#x2F;&#x2F; 切换CCLK频率，CCLK频率具体值在COR0中配置</span><br><span class="line">01010:  GRESTORE&#x2F;&#x2F; 拉高GRESTORE信号，复位或置位IOB和CLB_FF</span><br><span class="line">01011:  SHUTDOWN&#x2F;&#x2F; 关闭序列</span><br><span class="line">01100:  GCAPTURE&#x2F;&#x2F; 拉高GCAPTURE信号</span><br><span class="line">01101:  DESYNC  &#x2F;&#x2F; 复位DALIGN信号，解同步指令</span><br><span class="line">01111:  IPROG   &#x2F;&#x2F; 内部PROG触发，Multiboot跳转</span><br><span class="line">10000:  CRCC    &#x2F;&#x2F; ！！！不晓得，没看懂！！！</span><br><span class="line">10001:  LTIMER  &#x2F;&#x2F; 重新Load看门狗</span><br><span class="line">10010:  BSPI_READ&#x2F;&#x2F; 重新读位流</span><br><span class="line">10011:  FALL_EDGE&#x2F;&#x2F; 下降沿采样</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-CTL0-控制寄存器0"><a href="#4-3-CTL0-控制寄存器0" class="headerlink" title="4.3 CTL0 控制寄存器0"></a>4.3 CTL0 控制寄存器0</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[31]: EFUSE_KEY         &#x2F;&#x2F; AES key存哪里，0：电池BRAM  1：eFUSE</span><br><span class="line">[30]: ICAP_SELECT       &#x2F;&#x2F; 0：用上半部的ICAPE2  1：用下半部的ICAPE2</span><br><span class="line">[12]: OverTempPowerDown &#x2F;&#x2F; 超温关机功能 0：关闭  1：打开</span><br><span class="line">[10]: ConfigFallback    &#x2F;&#x2F; 回读功能 0：使能  1：不使能</span><br><span class="line">[8]: GLUTMASK_B         &#x2F;&#x2F; 可变内容是否回读 0：读  1：不读</span><br><span class="line">[7]: FARSRC             &#x2F;&#x2F; 没看懂</span><br><span class="line">[6]: DEC                &#x2F;&#x2F; AES解密 0：不使能 1：使能</span><br><span class="line">[5:4]: SBITS            &#x2F;&#x2F; 秘密等级  00：写读都可以 01：关闭读  1x：写读都关闭</span><br><span class="line">[3]: PERSIST            &#x2F;&#x2F; 是否保持配置专用管脚功能  0：不保留  1：保留</span><br><span class="line">[0]: GTS_USR_B          &#x2F;&#x2F; 三态IO是否上下拉  0：不拉 1：上拉</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-5-STAT-状态寄存器"><a href="#4-5-STAT-状态寄存器" class="headerlink" title="4.5 STAT 状态寄存器"></a>4.5 STAT 状态寄存器</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[26:25]: BUS_WIDTH      &#x2F;&#x2F; 00：x1 </span><br><span class="line">                           01：x8 </span><br><span class="line">                           10：x16 </span><br><span class="line">                           11：x32</span><br><span class="line">[20:18]: STARTUP_STATE  &#x2F;&#x2F; Phase 0 &#x3D; 000</span><br><span class="line">                           Phase 1 &#x3D; 001</span><br><span class="line">                           Phase 2 &#x3D; 011</span><br><span class="line">                           Phase 3 &#x3D; 010</span><br><span class="line">                           Phase 4 &#x3D; 110</span><br><span class="line">                           Phase 5 &#x3D; 111</span><br><span class="line">                           Phase 6 &#x3D; 101</span><br><span class="line">                           Phase 7 &#x3D; 100</span><br><span class="line">[16]: DEC_ERROR         &#x2F;&#x2F; 0: No error 1: ERROR</span><br><span class="line">[15]: ID_ERROR          &#x2F;&#x2F; 0: No error 1: ERROR</span><br><span class="line">[14]: DONE              &#x2F;&#x2F; DONE管脚状态</span><br><span class="line">[13]: RELEASE_DONE      &#x2F;&#x2F; DONE管脚内部状态</span><br><span class="line">[12]: INITB             &#x2F;&#x2F; INITB管脚状态</span><br><span class="line">[11]: RELEASE_INITB     &#x2F;&#x2F; INITB管脚内部状态</span><br><span class="line">[10:8]: MODE            &#x2F;&#x2F; M[2:0]管脚状态</span><br><span class="line">[7]: GHIGH_B            &#x2F;&#x2F; GHIGH_B信号状态</span><br><span class="line">[6]: GWE                &#x2F;&#x2F; GWE信号状态</span><br><span class="line">[5]: GTS_CFG_B          &#x2F;&#x2F; GTS_CFG_B信号状态</span><br><span class="line">[4]: EOS                &#x2F;&#x2F; 启动序列是否完成</span><br><span class="line">[3]: DCI_MATCH          &#x2F;&#x2F; DCI_MATCH</span><br><span class="line">[2]: MMCM_LOCK          &#x2F;&#x2F; MMCM_LOCK</span><br><span class="line">[1]: PART_SECURED       &#x2F;&#x2F; PART_SECURED</span><br><span class="line">[0]: CRC_ERROR          &#x2F;&#x2F; CRC_ERROR</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-6-COR0-配置寄存器0"><a href="#4-6-COR0-配置寄存器0" class="headerlink" title="4.6 COR0 配置寄存器0"></a>4.6 COR0 配置寄存器0</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[27]: PWRDWN_STAT       &#x2F;&#x2F; 改变DONE管脚功能为POWNDOWN</span><br><span class="line">[25]: DONE_PIPE         &#x2F;&#x2F; 是否寄存器一拍DONE信号</span><br><span class="line">[24]: DRIVE_DONE        &#x2F;&#x2F; 0：DONE信号开漏  1：DONE信号驱动</span><br><span class="line">[23]: SINGLE            &#x2F;&#x2F; 搞不懂</span><br><span class="line">[22:17]: OSCFSEL        &#x2F;&#x2F; CCLK频率，2M~60M</span><br><span class="line">[16:15]: SSCLKSRC       &#x2F;&#x2F; 00: CCLK  01:UserClk (per connection on the CAPTUREE2 block)  1x: JTAGClk</span><br><span class="line">[14:12]: DONE_CYCLE     &#x2F;&#x2F; DONE在哪个阶段起来</span><br><span class="line">                           000: Startup phase 1</span><br><span class="line">                           001: Startup phase 2</span><br><span class="line">                           010: Startup phase 3</span><br><span class="line">                           011: Startup phase 4</span><br><span class="line">                           100: Startup phase 5</span><br><span class="line">                           101: Startup phase 6</span><br><span class="line">                           111: Keep (not recommended)</span><br><span class="line">[11:9]: MATCH_CYCLE     &#x2F;&#x2F; DCI Match阶段</span><br><span class="line">[8:6]: LOCK_CYCLE       &#x2F;&#x2F; MMCK lock阶段</span><br><span class="line">[5:3]: GTS_CYCLE        &#x2F;&#x2F; GTS释放阶段</span><br><span class="line">[2:0]: GWE_CYCLE        &#x2F;&#x2F; GWE释放阶段</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-7-COR1-配置寄存器1"><a href="#4-7-COR1-配置寄存器1" class="headerlink" title="4.7 COR1 配置寄存器1"></a>4.7 COR1 配置寄存器1</h3><p>这里省略了一些我没理清除的一些内容。。。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[3:2]: BPI_1ST_READ_CYCLE &#x2F;&#x2F; First byte read timing:</span><br><span class="line">                             00: 1 CCLK (default)</span><br><span class="line">                             01: 2 CCLKs</span><br><span class="line">                             10: 3 CCLKs</span><br><span class="line">                             11: 4 CCLKs</span><br><span class="line">[1:0]: BPI_PAGE_SIZE      &#x2F;&#x2F; Flash memory page size:</span><br><span class="line">                             00: 1 byte&#x2F;word (default)</span><br><span class="line">                             01: 4 bytes&#x2F;words</span><br><span class="line">                             10: 8 bytes&#x2F;words</span><br><span class="line">                             11: Reserved</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-8-BPI配置寄存器"><a href="#4-8-BPI配置寄存器" class="headerlink" title="4.8 BPI配置寄存器"></a>4.8 BPI配置寄存器</h3><p><img src="https://s1.ax1x.com/2020/03/14/8lGyXF.png" alt="8lGyXF.png"></p>
+]]></content>
+      <categories>
+        <category>XILINX</category>
+        <category>Xilinx 7系列配置</category>
+      </categories>
+      <tags>
+        <tag>XILINX</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>(Xilinx-7系配置4) 配置加载流程</title>
+    <url>/posts/ea757907/</url>
+    <content><![CDATA[<p>xilinx 7系列fpga配置接口有多种多样，但内部流程都是一样的，如下图所示：<br><img src="https://s1.ax1x.com/2020/03/12/8mmWUs.png" alt="8mmWUs.png"></p>
+<ul>
+<li>设备上电</li>
+<li>清除配置</li>
+<li>采样配置模式</li>
+<li>查找同步</li>
+<li>设备ID检测</li>
+<li>加载配置位流</li>
+<li>CRC校验</li>
+<li>启动序列<a id="more"></a>
+<h3 id="阶段1-设备上电"><a href="#阶段1-设备上电" class="headerlink" title="阶段1. 设备上电"></a>阶段1. 设备上电</h3>FPGA的电源VCCO0、VCCAUX、VCCBRAM、VCCINT都需要正常上电，下面这些是配置需要的供电：<br><img src="https://s1.ax1x.com/2020/03/12/8mMKsK.png" alt="8mMKsK.png"></li>
+</ul>
+<p>上电时序如下：<br><img src="https://s1.ax1x.com/2020/03/12/8m1tzR.png" alt="8m1tzR.png"></p>
+<p>在fpga正常上电或配置后，可以通过拉低PROGRAM_B管脚重配置FPGA，时序如下：<br><img src="https://s1.ax1x.com/2020/03/12/8mGAIO.png" alt="8mGAIO.png"></p>
+<p>从上图可以看出，加载模式管脚是在INIT_B上升沿采样的。</p>
+<h3 id="阶段2-清除配置"><a href="#阶段2-清除配置" class="headerlink" title="阶段2. 清除配置"></a>阶段2. 清除配置</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mGRyR.png" alt="8mGRyR.png"><br>紧接着上电阶段、或者PROGRAM_B拉低后、或者JTAG发送JPROGRAM指令后、或者IPROG命令后、或者fallback发生后，开始进行配置区域清除操作。BRAM恢复到初始态，FF等通过GSR全局复位管脚复位。通过GTS信号，将IO管脚都置为高阻态，如果PUDC_B管脚为低，IO上会有一个上拉电阻使能。这时INIT_B由FPGA内部驱动拉低，等待时间TPOR后(参考前面时序图)释放INIT_B，INIT_B由外部上拉电阻拉高。如果外部强制把INIT_B拉低，也就是说不让INIT_B起来，就可以实现延迟启动的功能。</p>
+<h3 id="阶段3-采样配置模式"><a href="#阶段3-采样配置模式" class="headerlink" title="阶段3. 采样配置模式"></a>阶段3. 采样配置模式</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mt9Mj.png" alt="8mt9Mj.png"><br>当INIT_B上升沿发生，FPGA采样M[2:0]配置管脚，如果是Master模式就驱动CCLK输出，对于BPI或者SelectMap模式，这时内部状态是x8模式，这个模式会持续到位宽检测那个时刻。</p>
+<h3 id="阶段4-查找同步"><a href="#阶段4-查找同步" class="headerlink" title="阶段4. 查找同步"></a>阶段4. 查找同步</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mtbpF.png" alt="8mtbpF.png"><br>基于上一步采样的模式，接下来就开始读取配置数据了，配置数据的头部，都含有用于判断位宽的数据，位宽判断方法请参考我另外一篇博文：<a href="https://www.cdutcl.com/posts/60ffd69e/">位流位宽检测机理</a>，当总线位宽确定后，就按照真实位宽查找配置数据中的同步头数据(0xAA995566)。</p>
+<h3 id="阶段5-设备ID检测"><a href="#阶段5-设备ID检测" class="headerlink" title="阶段5. 设备ID检测"></a>阶段5. 设备ID检测</h3><p><img src="https://s1.ax1x.com/2020/03/12/8maFeA.png" alt="8maFeA.png"><br>当找到同步头以后，需要判断ID后才能加载后面的位流，这样可以避免器件不匹配的错误。7系列的ID格式如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vvvv:fffffff:aaaaaaaaa:ccccccccccc1</span><br><span class="line"></span><br><span class="line">v: 4bit, version</span><br><span class="line">f: 7bit, family code</span><br><span class="line">a: 9bit, array code(4bit sub-family and 5bit device code)</span><br><span class="line">c: company code</span><br></pre></td></tr></table></figure>
+
+<h3 id="阶段6-加载配置位流"><a href="#阶段6-加载配置位流" class="headerlink" title="阶段6. 加载配置位流"></a>阶段6. 加载配置位流</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mdM9K.png" alt="8mdM9K.png"><br>经过上述的同步字、ID检测后，接下来就是按照数据帧配置FPGA了。具体帧结构，等后面有时间写另外一篇博文来说明。</p>
+<h3 id="阶段7-CRC校验"><a href="#阶段7-CRC校验" class="headerlink" title="阶段7. CRC校验"></a>阶段7. CRC校验</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mdf3T.png" alt="8mdf3T.png"><br>在加载数据帧时，FPGA会基于这些数据帧算出了一个CRC值，当所有的帧都加载完成以后，得到一个最终CRC，位流的尾部会有一个CRC期待值以及CRC检测指令。如果CRC检测不一致，FPGA会拉低INIT_B信号以表示CRC错误，然后中断配置流程。</p>
+<h3 id="阶段8-启动序列"><a href="#阶段8-启动序列" class="headerlink" title="阶段8. 启动序列"></a>阶段8. 启动序列</h3><p><img src="https://s1.ax1x.com/2020/03/12/8mBM90.png" alt="8mBM90.png"><br>通过前面的步骤，已经将配置位流正确的加载到了FPGA内部。这一步是FPGA的一个启动过程，又分为8个小的步骤(phases 0-7)：<br><img src="https://s1.ax1x.com/2020/03/12/8mBcEd.png" alt="8mBcEd.png"><br>当这几个步骤完成后，FPGA释放DONE信号，DONE信号由外部上拉电阻拉高。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>整体过程如下图所示：<br><img src="https://s1.ax1x.com/2020/03/12/8mDDGq.png" alt="8mDDGq.png"></p>
+<hr>
+]]></content>
+      <categories>
+        <category>XILINX</category>
+        <category>Xilinx 7系列配置</category>
+      </categories>
+      <tags>
+        <tag>XILINX</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>(Xilinx-7系配置3) bit swapping功能描述</title>
+    <url>/posts/2cc4f630/</url>
+    <content><![CDATA[<p>本文主要描述xilinx 7系列位流中，bit位交换的功能。</p>
+<a id="more"></a>
+<h2 id="1、位交换功能"><a href="#1、位交换功能" class="headerlink" title="1、位交换功能"></a>1、位交换功能</h2><p>xilinx位交换功能，主要是用在生成并行PROM配置文件的时候使用。生成spi的配置文件时，是不需要该功能的，而生成并行MCS时，默认是打开该功能的。</p>
+<h2 id="2、功能详细描述"><a href="#2、功能详细描述" class="headerlink" title="2、功能详细描述"></a>2、功能详细描述</h2><p>位交换功能仅仅对字节操作，仅仅将byte数据高低位颠倒，如图所示：<br><img src="https://s1.ax1x.com/2020/03/12/8m9Mb6.png" alt="8m9Mb6.png"></p>
+<h2 id="3、数据配置"><a href="#3、数据配置" class="headerlink" title="3、数据配置"></a>3、数据配置</h2><h3 id="3-1、8位并行模式"><a href="#3-1、8位并行模式" class="headerlink" title="3.1、8位并行模式"></a>3.1、8位并行模式</h3><p>拿同步字来举例，生成的bit位流中，原始同步数据和swap后数据如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">AA 99 55 66  </span><br><span class="line"> |  |  |  |</span><br><span class="line"> V  V  V  V</span><br><span class="line">55 99 AA 66</span><br></pre></td></tr></table></figure>
+<p>假设配置总线是D[7:0]，按字节将数据传递到总线中，比如: </p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">AA(10101010) &#x3D;&gt; 字节的MSB接D0 &#x3D;&gt; D[0:7](10101010) &#x3D;&gt; D[7:0](01010101)55</span><br></pre></td></tr></table></figure>
+<p>所以，我们本来是要传递数据AA，到D[7:0]总线上数据变成了55。</p>
+<h3 id="3-2、16位并行模式"><a href="#3-2、16位并行模式" class="headerlink" title="3.2、16位并行模式"></a>3.2、16位并行模式</h3><p>基于上述的8位模式，如果总线是16位，那么每个周期就传递2个字节，这里的规则是，先来的字节放在高位，流程如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-&gt; AA -&gt; 99 -&gt; 55 -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 55 -&gt; 99 -&gt; AA -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 5599 -&gt; AA66 -&gt;</span><br></pre></td></tr></table></figure>
+<p>所以，16位总线D[15:0]上数据流就是：5599 -&gt; AA66  </p>
+<h3 id="3-3、32位并行模式"><a href="#3-3、32位并行模式" class="headerlink" title="3.3、32位并行模式"></a>3.3、32位并行模式</h3><p>有了上述16位总线的规律，这个32位就好理解了：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-&gt; AA -&gt; 99 -&gt; 55 -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 55 -&gt; 99 -&gt; AA -&gt; 66 -&gt;</span><br><span class="line">        |||||</span><br><span class="line">        VVVVV</span><br><span class="line">-&gt; 5599AA66 -&gt;</span><br></pre></td></tr></table></figure>
+<p>所以，32位总线D[31:0]上数据流就是：5599AA66  </p>
+<h2 id="4、软件配置"><a href="#4、软件配置" class="headerlink" title="4、软件配置"></a>4、软件配置</h2><p>有了上述原理，我们就可以通过CPU读取BIN文件，然后通过并口配置fpga。<br>这里就可以根据CPU取数的大小端方式，然后按照顺序配置FPGA即可。</p>
+<hr>
+]]></content>
+      <categories>
+        <category>XILINX</category>
+        <category>Xilinx 7系列配置</category>
+      </categories>
+      <tags>
+        <tag>XILINX</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>(Xilinx-7系配置2) 位流位宽检测机理</title>
+    <url>/posts/60ffd69e/</url>
+    <content><![CDATA[<p>本文主要介绍xilinx7系列在上电加载时，对总线位宽自动检测的机制。</p>
+<a id="more"></a>
+<h2 id="位宽检测"><a href="#位宽检测" class="headerlink" title="位宽检测"></a>位宽检测</h2><p>每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。<br>检测机理如下：<br><img src="https://s1.ax1x.com/2020/03/12/8ZMWQK.png" alt="8ZMWQK.png"><br>如上图所示：<br>上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了：</p>
+<h3 id="1-8位模式判断"><a href="#1-8位模式判断" class="headerlink" title="1. 8位模式判断"></a>1. 8位模式判断</h3><p>数据按字节输入：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00-&gt;00-&gt;00-&gt;BB-&gt;11-&gt;22-&gt;00-&gt;44-&gt;</span><br></pre></td></tr></table></figure>
+<p>判断到BB后紧跟着11，说明总线是8位宽度；</p>
+<h3 id="2-16位模式判断"><a href="#2-16位模式判断" class="headerlink" title="2. 16位模式判断"></a>2. 16位模式判断</h3><p>数据按双字节输入：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0000-&gt;00BB-&gt;1122-&gt;0044-&gt;</span><br></pre></td></tr></table></figure>
+<p>低8位中，BB后紧跟着22，说明总线是16位宽度；</p>
+<h3 id="3-32位模式判断"><a href="#3-32位模式判断" class="headerlink" title="3. 32位模式判断"></a>3. 32位模式判断</h3><p>数据按四字节输入：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">000000BB-&gt;11220044-&gt;</span><br></pre></td></tr></table></figure>
+<p>低8位中，BB后紧跟着44，说明总线是32位宽度；</p>
+<p>根据如上机理，即可判断总线宽度。</p>
+<hr>
+]]></content>
+      <categories>
+        <category>XILINX</category>
+        <category>Xilinx 7系列配置</category>
+      </categories>
+      <tags>
+        <tag>XILINX</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>(Xilinx-7系配置1) 数据文件格式</title>
+    <url>/posts/df2d2b3/</url>
+    <content><![CDATA[<p>Xilinx的配置文件格式多种多样，bit、rbt、bin、mcs等等，本文主要介绍这些格式的文件都有什么差异，在什么场景下用什么文件。</p>
+<a id="more"></a>
+<h2 id="配置文件后缀"><a href="#配置文件后缀" class="headerlink" title="配置文件后缀"></a>配置文件后缀</h2><h3 id="1-bit格式"><a href="#1-bit格式" class="headerlink" title="1. bit格式"></a>1. bit格式</h3><p>默认生成文件类型，包含一些冗余的头部信息，这些头部信息是不需要下载到FPGA里面的。bit文件可以直接通过jtag加载到fpga中，掉电消失。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMmGt.png" alt="8ZMmGt.png"></p>
+<h3 id="2-rbt格式"><a href="#2-rbt格式" class="headerlink" title="2. rbt格式"></a>2. rbt格式</h3><p>在ISE中使能了-b选项、在vivado中使能了-raw_bitfile选项，就可以生成该文件，该文件内容和bit一致，只是说这个是ASCII格式，bit是bin格式。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMePI.png" alt="8ZMePI.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMVIA.png" alt="8ZMVIA.png"></p>
+<h3 id="3-bin格式"><a href="#3-bin格式" class="headerlink" title="3. bin格式"></a>3. bin格式</h3><p>在ISE中使能了-g binary:yes选项、在vivado中使能了-bin_file选项，就可以生成该文件，该文件内容相当于bit文件剔除了头部冗余信息。后面完全一致。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMAVH.png" alt="8ZMAVH.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMEad.png" alt="8ZMEad.png"></p>
+<h3 id="4-mcs格式"><a href="#4-mcs格式" class="headerlink" title="4. mcs格式"></a>4. mcs格式</h3><p>在vivado中，使用write_cfgmem -format mcs命令可以将bit文件转换成mcs文件，mcs文件也是ASCII格式，可以直接用文本工具打开，主要是在bin的基础上，增加了地址信息和校验信息。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMnRP.png" alt="8ZMnRP.png"></p>
+<hr>
+]]></content>
+      <categories>
+        <category>XILINX</category>
+        <category>Xilinx 7系列配置</category>
       </categories>
       <tags>
         <tag>XILINX</tag>

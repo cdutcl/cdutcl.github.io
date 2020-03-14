@@ -23,16 +23,16 @@
     var CONFIG = {"hostname":"www.cdutcl.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="7系列FPGA的配置位流bit，头部开始有一些冗余的基本信息：比如bit的生成时间、生成工具的版本、top名称等信息。这些信息仅仅用于标识bit文件本身，不会下载到fpga或配置flash中。除去这些信息以外，其他剩下的就是下载到fpga、或flash中的数据。也就是bin文件的内容。 1、配置数据构成123456789101112131415161718192021222324252627282">
+  <meta name="description" content="7系列FPGA的配置位流bit，头部开始有一些冗余的基本信息：比如bit的生成时间、生成工具的版本、top名称等信息。这些信息仅仅用于标识bit文件本身，不会下载到fpga或配置flash中。除去这些信息以外，其他剩下的就是下载到fpga、或flash中的数据。也就是bin文件的内容。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="(Xilinx-7系配置5) 配置bit位流格式">
 <meta property="og:url" content="https://www.cdutcl.com/posts/bded59c/index.html">
 <meta property="og:site_name" content="CDUTCL">
-<meta property="og:description" content="7系列FPGA的配置位流bit，头部开始有一些冗余的基本信息：比如bit的生成时间、生成工具的版本、top名称等信息。这些信息仅仅用于标识bit文件本身，不会下载到fpga或配置flash中。除去这些信息以外，其他剩下的就是下载到fpga、或flash中的数据。也就是bin文件的内容。 1、配置数据构成123456789101112131415161718192021222324252627282">
+<meta property="og:description" content="7系列FPGA的配置位流bit，头部开始有一些冗余的基本信息：比如bit的生成时间、生成工具的版本、top名称等信息。这些信息仅仅用于标识bit文件本身，不会下载到fpga或配置flash中。除去这些信息以外，其他剩下的就是下载到fpga、或flash中的数据。也就是bin文件的内容。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://s1.ax1x.com/2020/03/14/8lGyXF.png">
-<meta property="article:published_time" content="2020-03-14T10:27:37.000Z">
-<meta property="article:modified_time" content="2020-03-14T12:42:08.644Z">
+<meta property="article:published_time" content="2018-04-15T10:27:37.000Z">
+<meta property="article:modified_time" content="2020-03-14T13:06:22.740Z">
 <meta property="article:author" content="cdutcl">
 <meta property="article:tag" content="XILINX">
 <meta name="twitter:card" content="summary">
@@ -227,10 +227,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020/03/14 18:27:37 / 修改时间：20:42:08" itemprop="dateCreated datePublished" datetime="2020-03-14T18:27:37+08:00">2020/03/14</time>
+              <time title="创建时间：2018/04/15 18:27:37" itemprop="dateCreated datePublished" datetime="2018-04-15T18:27:37+08:00">2018/04/15</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020/03/14 21:06:22" itemprop="dateModified" datetime="2020-03-14T21:06:22+08:00">2020/03/14</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -278,6 +284,7 @@
 
       
         <p>7系列FPGA的配置位流bit，头部开始有一些冗余的基本信息：比如bit的生成时间、生成工具的版本、top名称等信息。这些信息仅仅用于标识bit文件本身，不会下载到fpga或配置flash中。除去这些信息以外，其他剩下的就是下载到fpga、或flash中的数据。也就是bin文件的内容。</p>
+<a id="more"></a>
 <h2 id="1、配置数据构成"><a href="#1、配置数据构成" class="headerlink" title="1、配置数据构成"></a>1、配置数据构成</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据1</span><br><span class="line">...</span><br><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据8</span><br><span class="line">000000BB    &#x2F;&#x2F; 总线位宽检测字1</span><br><span class="line">11220044    &#x2F;&#x2F; 总线位宽检测字2</span><br><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据</span><br><span class="line">FFFFFFFF    &#x2F;&#x2F; Dummy 数据</span><br><span class="line">AA995566    &#x2F;&#x2F; 同步字</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">30022001    &#x2F;&#x2F; Packet Type 1: 写TIMER寄存器，WORD_COUNT&#x3D;1  # 具体格式在后面描述</span><br><span class="line">00000000    &#x2F;&#x2F; TIMER[31:0]&#x3D;00000000(hex)</span><br><span class="line">...         &#x2F;&#x2F; 具体内容可以去ug470查，我这里就不搬过来了。</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">...         &#x2F;&#x2F; NOOP数据</span><br><span class="line">30002001    &#x2F;&#x2F; Packet Type 1: 写FAR寄存器，WORD_COUNT&#x3D;1</span><br><span class="line">00000000    &#x2F;&#x2F; 写Frame地址为0</span><br><span class="line">30002001    &#x2F;&#x2F; Packet Type 1: 写CMD寄存器，WORD_COUNT&#x3D;1</span><br><span class="line">00000001    &#x2F;&#x2F; 00001 写配置数据命令</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">30004000    &#x2F;&#x2F; Packet Type 1: 写FDRI寄存器，WORD_COUNT&#x3D;0</span><br><span class="line">502BA520    &#x2F;&#x2F; Packet Type 2: 写FDRI寄存器，WORD_COUNT&#x3D;2860320</span><br><span class="line">00000000    &#x2F;&#x2F; 数据字1，之前都是配置寄存那些，从这里开始就是真正配置FPGA内部的配置数据，一帧一帧组合在一起</span><br><span class="line">...         &#x2F;&#x2F; 数据字N</span><br><span class="line">00000000    &#x2F;&#x2F; 数据字2860320( 101字&#x2F;帧 x 28320帧)</span><br><span class="line">30000001    &#x2F;&#x2F; Packet Type 1: 写CRC寄存器，WORD_COUNT&#x3D;1</span><br><span class="line">????????    &#x2F;&#x2F; 写CRC值，如果值和FPGA内部计算出来不一致，就进入错误态。</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">...         &#x2F;&#x2F; 然后又操作几个寄存器，比如释放同步信号等。</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br><span class="line">...         &#x2F;&#x2F; NOOP数据</span><br><span class="line">20000000    &#x2F;&#x2F; NOOP数据</span><br></pre></td></tr></table></figure>
 
 <h2 id="2、配置数据帧"><a href="#2、配置数据帧" class="headerlink" title="2、配置数据帧"></a>2、配置数据帧</h2><p>如上述格式描述所示，bit其实就是由一些头部功能字段+配置寄存器字段+真实配置数据帧+收尾配置寄存器这几部分组成。7系列的配置数据由N个配置数据帧组成，每个帧由101个32位数据组成。</p>
@@ -367,6 +374,18 @@
           <div class="post-tags">
               <a href="/tags/XILINX/" rel="tag"><i class="fa fa-tag"></i> XILINX</a>
           </div>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+     style="display:block; text-align:center;"
+     data-ad-layout="in-article"
+     data-ad-format="fluid"
+     data-ad-client="ca-pub-8235718069863570"
+     data-ad-slot="3493436304"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
 
         
 
@@ -377,7 +396,10 @@
     <a href="/posts/ea757907/" rel="prev" title="(Xilinx-7系配置4) 配置加载流程">
       <i class="fa fa-chevron-left"></i> (Xilinx-7系配置4) 配置加载流程
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/posts/21e5acfb/" rel="next" title="Zynq外设之--GPIO">
+      Zynq外设之--GPIO <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -488,23 +510,23 @@
         
         
           <li>
-            <a href="/posts/bded59c/" title="(Xilinx-7系配置5) 配置bit位流格式" target="_blank">(Xilinx-7系配置5) 配置bit位流格式</a>
-          </li>
-        
-          <li>
-            <a href="/posts/ea757907/" title="(Xilinx-7系配置4) 配置加载流程" target="_blank">(Xilinx-7系配置4) 配置加载流程</a>
-          </li>
-        
-          <li>
-            <a href="/posts/2cc4f630/" title="(Xilinx-7系配置3) bit swapping功能描述" target="_blank">(Xilinx-7系配置3) bit swapping功能描述</a>
-          </li>
-        
-          <li>
             <a href="/posts/ed91337d/" title="VIM笔记-中文乱码问题" target="_blank">VIM笔记-中文乱码问题</a>
           </li>
         
           <li>
-            <a href="/posts/60ffd69e/" title="(Xilinx-7系配置2) 位流位宽检测机理" target="_blank">(Xilinx-7系配置2) 位流位宽检测机理</a>
+            <a href="/posts/87fd19ae/" title="Ubuntu18.04安装中文支持" target="_blank">Ubuntu18.04安装中文支持</a>
+          </li>
+        
+          <li>
+            <a href="/posts/68515062/" title="常用电平标准汇总(TTL/LVTTL/CMOS/LVCOMS)" target="_blank">常用电平标准汇总(TTL/LVTTL/CMOS/LVCOMS)</a>
+          </li>
+        
+          <li>
+            <a href="/posts/bbe125fa/" title="patch命令用法" target="_blank">patch命令用法</a>
+          </li>
+        
+          <li>
+            <a href="/posts/6f480b13/" title="(Xilinx-7系列) LVDS供电" target="_blank">(Xilinx-7系列) LVDS供电</a>
           </li>
         
       </ul>

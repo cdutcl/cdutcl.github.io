@@ -144,6 +144,11 @@
     <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
 
   </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -196,6 +201,119 @@
             
 
   <div class="posts-expand">
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/posts/d5b766a5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cdutcl">
+      <meta itemprop="description" content="FPGA">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CDUTCL">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/d5b766a5/" class="post-title-link" itemprop="url">EBAZ4205 ZYNQ开发板初始化</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020/02/27 08:10:48" itemprop="dateCreated datePublished" datetime="2020-02-27T08:10:48+08:00">2020/02/27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020/03/12 16:58:41" itemprop="dateModified" datetime="2020-03-12T16:58:41+08:00">2020/03/12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/" itemprop="url" rel="index"><span itemprop="name">XILINX</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/XILINX/EBAZ4205/" itemprop="url" rel="index"><span itemprop="name">EBAZ4205</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>486</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>今天给大家介绍一个低成本的Zynq开发板：EBAZ4205</p>
+<p>成本有多低呢？(^_^) 我买了三块，<font color=#DC143C><strong>100元包邮!</strong></font><br>而且我还是买的比较晚了，据说再早些时候更便宜。</p>
+<hr>
+<h2 id="1-整板概览"><a href="#1-整板概览" class="headerlink" title="1. 整板概览"></a>1. 整板概览</h2><p>我们看看这个便宜的开发板长什么样子呢？<br><img src="https://s1.ax1x.com/2020/03/12/8Z3STe.jpg" alt="8Z3STe.jpg"><br>如上图所示，主芯片采用的是Xilinx的XC7Z010-1CLG400，板子上含有的外设及接口有：<br><strong>33.33M晶振、NAND FLASH、DDR3、以太网、LED、UART插针、按键、IO插针</strong><br>板子的<strong>原理图</strong>在这里：<a href="ebaz_files/ebaz4205_sch.pdf">PDF</a></p>
+<hr>
+<h2 id="2-板子初始化"><a href="#2-板子初始化" class="headerlink" title="2. 板子初始化"></a>2. 板子初始化</h2><p>刚拿到板子，需要做几个初始化工作：</p>
+<ul>
+<li>焊接SD卡座</li>
+<li>焊接UART插针</li>
+<li>焊接JTAG插针</li>
+<li>接通电源插座</li>
+</ul>
+<hr>
+<h2 id="3-电源部分"><a href="#3-电源部分" class="headerlink" title="3. 电源部分"></a>3. 电源部分</h2><p>板子上J4是一个6P的电源插座，从丝印可以看出来是接12V电源，但当我供给它12V电源以后，发现板子并没有工作。经过排查后，从电路图才发现，该电源座输入的12V，有个二极管默认没有焊接：<br><img src="https://s1.ax1x.com/2020/03/12/8Z1zwD.png" alt="8Z1zwD.png"><br>图中可以看出这里需要一个二极管，直接短接即可，我为了安全起见，把板子上D21处的二极管挪过来了：<br><img src="https://s1.ax1x.com/2020/03/12/8Z39FH.png" alt="8Z39FH.png"></p>
+<hr>
+<h2 id="4-环境搭建"><a href="#4-环境搭建" class="headerlink" title="4. 环境搭建"></a>4. 环境搭建</h2><p>做好上述准备工作后，接好仿真器、串口电缆，就可以给开发板通电了。<br><img src="https://s1.ax1x.com/2020/03/12/8Z3A6P.jpg" alt="8Z3A6P.jpg"></p>
+<hr>
+<h2 id="5-通电串口打印"><a href="#5-通电串口打印" class="headerlink" title="5. 通电串口打印"></a>5. 通电串口打印</h2><p>打开串口终端，可以看到uboot的打印了，说明板子开始工作了。<br><img src="https://s1.ax1x.com/2020/03/12/8Z1xeO.png" alt="8Z1xeO.png"></p>
+<hr>
+
+      
+    </div>
+
+    
+    
+    
+    <div>
+      
+    </div>
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
         
   
   
@@ -1185,12 +1303,13 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-count">20</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
+          
         <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
@@ -1225,10 +1344,6 @@
         
         
           <li>
-            <a href="/posts/ed91337d/" title="VIM笔记-中文乱码问题" target="_blank">VIM笔记-中文乱码问题</a>
-          </li>
-        
-          <li>
             <a href="/posts/87fd19ae/" title="Ubuntu18.04安装中文支持" target="_blank">Ubuntu18.04安装中文支持</a>
           </li>
         
@@ -1242,6 +1357,10 @@
         
           <li>
             <a href="/posts/6f480b13/" title="(Xilinx-7系列) LVDS供电" target="_blank">(Xilinx-7系列) LVDS供电</a>
+          </li>
+        
+          <li>
+            <a href="/posts/f1c8e5a2/" title="EBAZ4205 Uboot移植（问题1）" target="_blank">EBAZ4205 Uboot移植（问题1）</a>
           </li>
         
       </ul>

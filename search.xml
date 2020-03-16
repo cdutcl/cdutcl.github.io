@@ -1,37 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>VIM笔记-中文乱码问题</title>
-    <url>/posts/ed91337d/</url>
-    <content><![CDATA[<p>由于工作需要，可能经常需要在Windows和Linux两个环境中切换。Vim乱码一直是让我头疼的一个事情，网上描述该问题的文章有很多，但都是直接说怎么做的，没有讲清楚其中的原理，所以整理这篇文章，希望能把该问题彻底解释清楚：  </p>
-<a id="more"></a>
-
-<h2 id="1-默认编码"><a href="#1-默认编码" class="headerlink" title="1. 默认编码"></a>1. 默认编码</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Windows中默认的文本编码是cp936，而Linux一般都是utf-8</span><br></pre></td></tr></table></figure>
-
-<h2 id="2-查看文件编码"><a href="#2-查看文件编码" class="headerlink" title="2. 查看文件编码"></a>2. 查看文件编码</h2><p>当你打开一个文本后，你可以在vim中输入下面命令查看文本编码：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">:set fileencoding</span><br></pre></td></tr></table></figure>
-<p>很多文章都是像上面这样描述，很容易让人误解。其实，上面这条命令并不是说查看文件的编码，而是vim自动识别的文件编码。所以，第一个乱码原因来了：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">如果vim错误的识别了文件编码，用其他编码来打开文件，就可能会出现乱码</span><br></pre></td></tr></table></figure>
-<p>这时，vim已经用它认为的编码模式打开了文本，vim就会按照fileencoding这个编码格式来处理文本，当你修改并保存文件时，vim就会以这个编码格式来保存文本。如果编码格式错乱了，那么，很可能你这个文本就全乱了。</p>
-<h2 id="3-用什么编码打开文本"><a href="#3-用什么编码打开文本" class="headerlink" title="3. 用什么编码打开文本"></a>3. 用什么编码打开文本</h2><p>由于文本的编码格式有很多，所以vim很可能识别错文本编码。这时fileencodings这个变量就出来了，根据文本的编码特征建议设置变量如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">:set fileencodings&#x3D;ucs-bom,utf-8,cp936</span><br></pre></td></tr></table></figure>
-<p>这样设置以后，vim就会按照你列出的编码方式，依次去判断文本编码。有时即使是这样，vim还是有可能会识别错文本编码。但如果你事先知道文本的正确编码，你可以用下面的命令，强制用某种编码去打开文本：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ vim file.txt -c &quot;e ++enc&#x3D;utf-8&quot;</span><br></pre></td></tr></table></figure>
-
-<h2 id="4-亡羊补牢"><a href="#4-亡羊补牢" class="headerlink" title="4. 亡羊补牢"></a>4. 亡羊补牢</h2><p>如果你已经打开了一个文本，而vim用的编码方式又错了，这时你可以用下面的命令切换一种编码方式去打开该文件：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">:edit ++enc&#x3D;utf-8</span><br></pre></td></tr></table></figure>
-
-<h2 id="5-保存文件"><a href="#5-保存文件" class="headerlink" title="5. 保存文件"></a>5. 保存文件</h2><p>如前文所说，当你编辑好文件，需要保存文本时，首先文件内容就是按照变量fileencoding的格式来保存，但另外还有一个变量需要注意：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">:set fileformat</span><br></pre></td></tr></table></figure>
-<p>这个变量不影响文件编码，但是它会影响换行。这个有dos格式和unix格式，一般在vim下面的状态栏里面会显示该文件的格式。如果是dos格式，在linux下面打开时，行结尾会多一个^M(\r)。删除^M的方法如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">%s&#x2F;\r&#x2F;&#x2F;g</span><br></pre></td></tr></table></figure>
-<hr>
-]]></content>
-      <tags>
-        <tag>Vim</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Ubuntu18.04安装中文支持</title>
     <url>/posts/87fd19ae/</url>
     <content><![CDATA[<p>本来主要描述Ubuntu18.04系统中，安装中文支持的方法，内容主要参考网络文章，自己尝试后编辑成文。</p>
@@ -168,6 +137,52 @@
         <tag>XILINX</tag>
         <tag>ZYNQ</tag>
         <tag>EBAZ4205</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VIM笔记-gvim环境变量</title>
+    <url>/posts/ba053a33/</url>
+    <content><![CDATA[<p>本文描述windows环境下使用的gvim，默认的环境变量。</p>
+<a id="more"></a>
+
+<h2 id="常用配置文件"><a href="#常用配置文件" class="headerlink" title="常用配置文件"></a>常用配置文件</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">系统vimrc配置文件：     $VIM\vimrc</span><br><span class="line">用户vimrc配置文件：     $HOME\_vimrc</span><br><span class="line">用户vimrc配置文件：     $HOME\vimfiles\vimrc</span><br><span class="line">用户vimrc配置文件：     $VIM\_vimrc</span><br></pre></td></tr></table></figure>
+<p>其中， $VIM就是vim的安装路径；$HOME就是用户的根目录；</p>
+<p>咱们经常在网上看到各种配置推荐，可以修改上述文件，即可保存配置；</p>
+<hr>
+]]></content>
+      <tags>
+        <tag>Vim</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VIM笔记-中文乱码问题</title>
+    <url>/posts/ed91337d/</url>
+    <content><![CDATA[<p>由于工作需要，可能经常需要在Windows和Linux两个环境中切换。Vim乱码一直是让我头疼的一个事情，网上描述该问题的文章有很多，但都是直接说怎么做的，没有讲清楚其中的原理，所以整理这篇文章，希望能把该问题彻底解释清楚：  </p>
+<a id="more"></a>
+
+<h2 id="1-默认编码"><a href="#1-默认编码" class="headerlink" title="1. 默认编码"></a>1. 默认编码</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Windows中默认的文本编码是cp936，而Linux一般都是utf-8</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-查看文件编码"><a href="#2-查看文件编码" class="headerlink" title="2. 查看文件编码"></a>2. 查看文件编码</h2><p>当你打开一个文本后，你可以在vim中输入下面命令查看文本编码：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">:set fileencoding</span><br></pre></td></tr></table></figure>
+<p>很多文章都是像上面这样描述，很容易让人误解。其实，上面这条命令并不是说查看文件的编码，而是vim自动识别的文件编码。所以，第一个乱码原因来了：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">如果vim错误的识别了文件编码，用其他编码来打开文件，就可能会出现乱码</span><br></pre></td></tr></table></figure>
+<p>这时，vim已经用它认为的编码模式打开了文本，vim就会按照fileencoding这个编码格式来处理文本，当你修改并保存文件时，vim就会以这个编码格式来保存文本。如果编码格式错乱了，那么，很可能你这个文本就全乱了。</p>
+<h2 id="3-用什么编码打开文本"><a href="#3-用什么编码打开文本" class="headerlink" title="3. 用什么编码打开文本"></a>3. 用什么编码打开文本</h2><p>由于文本的编码格式有很多，所以vim很可能识别错文本编码。这时fileencodings这个变量就出来了，根据文本的编码特征建议设置变量如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">:set fileencodings&#x3D;ucs-bom,utf-8,cp936</span><br></pre></td></tr></table></figure>
+<p>这样设置以后，vim就会按照你列出的编码方式，依次去判断文本编码。有时即使是这样，vim还是有可能会识别错文本编码。但如果你事先知道文本的正确编码，你可以用下面的命令，强制用某种编码去打开文本：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ vim file.txt -c &quot;e ++enc&#x3D;utf-8&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-亡羊补牢"><a href="#4-亡羊补牢" class="headerlink" title="4. 亡羊补牢"></a>4. 亡羊补牢</h2><p>如果你已经打开了一个文本，而vim用的编码方式又错了，这时你可以用下面的命令切换一种编码方式去打开该文件：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">:edit ++enc&#x3D;utf-8</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-保存文件"><a href="#5-保存文件" class="headerlink" title="5. 保存文件"></a>5. 保存文件</h2><p>如前文所说，当你编辑好文件，需要保存文本时，首先文件内容就是按照变量fileencoding的格式来保存，但另外还有一个变量需要注意：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">:set fileformat</span><br></pre></td></tr></table></figure>
+<p>这个变量不影响文件编码，但是它会影响换行。这个有dos格式和unix格式，一般在vim下面的状态栏里面会显示该文件的格式。如果是dos格式，在linux下面打开时，行结尾会多一个^M(\r)。删除^M的方法如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">%s&#x2F;\r&#x2F;&#x2F;g</span><br></pre></td></tr></table></figure>
+<hr>
+]]></content>
+      <tags>
+        <tag>Vim</tag>
       </tags>
   </entry>
   <entry>

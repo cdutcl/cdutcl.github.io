@@ -381,6 +381,52 @@
   </entry>
   
   <entry>
+    <title>(Xilinx-7系时钟1) 时钟架构概述</title>
+    <link href="https://www.cdutcl.com/posts/600eb62d/"/>
+    <id>https://www.cdutcl.com/posts/600eb62d/</id>
+    <published>2018-05-11T13:06:47.000Z</published>
+    <updated>2020-03-20T06:37:37.788Z</updated>
+    
+    <content type="html"><![CDATA[<p>记得当初刚开始入门FPGA的时候，师傅给我提了一个醒：所有的时钟，尽量上BUFG。虽然当时不知道原理，但还是谨记师傅指导，所有用到的时钟都用了BUFG。后来由于工程复杂程度不断增加，遇到的问题越来越多，才不得不梳理时钟架构。于是详细阅读了xilinx官方文档ug472，才对7系列的时钟架构有个整体概念。</p><a id="more"></a><h2 id="时钟区域"><a href="#时钟区域" class="headerlink" title="时钟区域"></a>时钟区域</h2><p>首先，先说一个时钟区域的基础概念: 7系列FPGA内部被分成了若干个时钟区域，最小的器件有1个区域，最大的器件有24个区域。比如7K325T，它的时钟区域有14个，分布如下：<br><img src="https://s1.ax1x.com/2020/03/20/8cmQTs.png" alt="8cmQTs.png"></p><p>每个时钟区域里面包含各种模块，比如：CLB、I/O、DSP、BRAM、CMT等。</p><h2 id="时钟布线资源"><a href="#时钟布线资源" class="headerlink" title="时钟布线资源"></a>时钟布线资源</h2><p>每个I/O Bank都有时钟输入专用管脚，接入专用时钟Buffer。FPGA分为上下两个部分，在FPGA的中心含有32个BUFG，上下各16个。在FPGA下半部分时钟区域的时钟输入专用IO输入的时钟，只能接入下半部的16个BUFG。同样，上半部时钟区域的时钟输入专用IO输入的时钟，只能接入上半部的16个BUFG。</p><p>每个时钟区域的中心水平线上，都有12根全局时钟专用走线，通过该走线可到达该区域内的各种逻辑资源，每个区域都有12个BUFH可以驱动这12根全局走线。</p><p>每个时钟区域靠近I/O Bank处，还有4个BUFR、4个BUFIO、2个BUFMR三类时钟Buffer，功能分别如下：</p><ul><li>BUFR：可以驱动该BUFR所处时钟区域内的各种逻辑资源，而且它还带分频功能；</li><li>BUFIO：只能驱动该BUFIO所处I/O Bank内的逻辑资源；</li><li>BUFMR：可以驱动该BUFMR所处时钟区域以及它相邻的区域的BUFR和BUFIO；<br><img src="https://s1.ax1x.com/2020/03/20/8cwfb9.png" alt="8cwfb9.png"></li></ul><h2 id="整体时钟架构"><a href="#整体时钟架构" class="headerlink" title="整体时钟架构"></a>整体时钟架构</h2><p>上面描述了一些基本概念，接下来我们来看一个整体架构图：<br><img src="https://s1.ax1x.com/2020/03/20/8ctlKs.png" alt="8ctlKs.png"><br>从上图可以看出，FPGA被垂直的时钟主干分为左右两半分布，然后又被水平的中心线分别上下两半部分。在中心位置可以看出，上下各16个总共32个BUFG。这32个BUFG不属于任何时钟区域，但它们可以驱动到任何时钟区域。水平方向上，每个区域水平中心上，有12根时钟线可以到达该区域的各个地方；垂直方向上，除了上述的中心时钟骨干以外，还有CMT时钟主干。每个时钟区域里面，含有50个CLB、10个36K BRAM(PCIe那个BANK除外)、20个DSP、12个BUFH、1个CMT、一个IO BANK或者GT BANK。</p><h2 id="连接规则汇总"><a href="#连接规则汇总" class="headerlink" title="连接规则汇总"></a>连接规则汇总</h2><table><thead><tr><th>时钟资源或IO</th><th>可以被谁连接</th><th>可以驱动谁</th></tr></thead><tbody><tr><td>MRCC</td><td>外部时钟</td><td>该管脚所处时钟区域中的：<br>- 该时钟区域中的4个BUFIO<br>- 该时钟区域中的4个BUFR<br>- 该时钟区域中的2个BUFMR<br>- 自己区域和上下相邻时钟区域的CMT<br>- 相同上下半部分的16个BUFG<br>- 该时钟区域中的12个BUFH</td></tr><tr><td>SRCC</td><td>外部时钟</td><td>该管脚所处时钟区域中的：<br>- 该时钟区域中的4个BUFIO<br>- 该时钟区域中的4个BUFR<br>- 自己区域和上下相邻时钟区域的CMT<br>- 相同上下半部分的16个BUFG<br>- 该时钟区域中的12个BUFH</td></tr><tr><td>BUFIO</td><td>- MRCC<br>- SRCC<br>- MMCM.CLKOUT0-3<br>- CLKFBOUT<br>- 该区域或上下相邻区域的BUFMR</td><td>- ILOGIC<br>- OLOGIC</td></tr><tr><td>BUFR</td><td>- MRCC<br>- SRCC<br>- MMCM.CLKOUT0-3<br>- CLKFBOUT<br>- 该区域或上下相邻区域的BUFMR<br>- 通用内部互联</td><td>- CMT<br>- 该时钟区域的任何资源<br>- 同半部分的16个BUFG</td></tr><tr><td>BUFMR</td><td>- MRCC<br>- GT的输出时钟<br>- 通用内部互联</td><td>- 该区域及上下相邻区域的BUFIO<br>- 该区域及上下相邻区域的BUFR</td></tr><tr><td>BUFG</td><td>- MRCC<br>- SRCC<br>- CMT<br>- GT的输出时钟<br>- BUFR<br>- 通用内部互联<br>- BUFG</td><td>- CMT<br>- GT的输出时钟<br>- BUG<br>- BUFH<br>- 所有通用资源</td></tr><tr><td>BUFH</td><td>- MRCC<br>- SRCC<br>- CMT<br>- GT的输出时钟<br>- 通用内部互联<br>- BUFG</td><td>- CMT<br>- GT的输出时钟<br>- 所有该区域的通用资源</td></tr><tr><td>- RXUSRCLK<br>- RXUSRCLK2<br>- TXUSRCLK<br>- TXUSRCLK2</td><td>- BUFG<br>- 同时钟区域的BUFH</td><td>N/A</td></tr><tr><td>- RXOUTCLK<br>- TXOUTCLK</td><td>N/A</td><td>- BUFG<br>- 同区域的CMT<br>- 同区域的BUFMR<br>- 同区域的BUFH</td></tr><tr><td>MGTREFCLK</td><td>外部时钟</td><td>- GT参考时钟<br>- BUFG<br>- 同区域的CMT<br>- 同区域的BUFMR<br>- 同区域的BUFH</td></tr><tr><td>CMT</td><td>- BUFG<br>- SRCC<br>- MRCC<br>- GT输出时钟<br>- 同区域的BUFR<br>- MMCM.CLKOUT0-3</td><td>- BUFG<br>- BUFIO<br>- BUFR<br>- BUFH<br>- MMCM</td></tr><tr><td>IDELAYCNTRL.CLK</td><td>- MRCC/SRCC<br>- BUFG<br>- BUFH</td><td>N/A</td></tr><tr><td>CCLK pin</td><td>配置逻辑</td><td>配置逻辑</td></tr><tr><td>EMCCLK</td><td>N/A</td><td>配置逻辑</td></tr><tr><td>TCK pin</td><td>N/A</td><td>JTAG配置逻辑</td></tr></tbody></table><hr>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;记得当初刚开始入门FPGA的时候，师傅给我提了一个醒：所有的时钟，尽量上BUFG。虽然当时不知道原理，但还是谨记师傅指导，所有用到的时钟都用了BUFG。后来由于工程复杂程度不断增加，遇到的问题越来越多，才不得不梳理时钟架构。于是详细阅读了xilinx官方文档ug472，才对7系列的时钟架构有个整体概念。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Xilinx 7系列时钟" scheme="https://www.cdutcl.com/categories/Xilinx-7%E7%B3%BB%E5%88%97%E6%97%B6%E9%92%9F/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>(Xilinx-7系配置6) Multiboot多版本加载</title>
+    <link href="https://www.cdutcl.com/posts/a4059a47/"/>
+    <id>https://www.cdutcl.com/posts/a4059a47/</id>
+    <published>2018-04-16T11:43:30.000Z</published>
+    <updated>2020-03-20T05:28:46.258Z</updated>
+    
+    <content type="html"><![CDATA[<p>7系列的FPGA具有一个多重加载功能(Multiboot)，</p><a id="more"></a>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;7系列的FPGA具有一个多重加载功能(Multiboot)，&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Xilinx 7系列配置" scheme="https://www.cdutcl.com/categories/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/"/>
+    
+    
+      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
+    
+  </entry>
+  
+  <entry>
     <title>(Xilinx-7系配置5) 配置bit位流格式</title>
     <link href="https://www.cdutcl.com/posts/bded59c/"/>
     <id>https://www.cdutcl.com/posts/bded59c/</id>
@@ -447,52 +493,6 @@
     <summary type="html">
     
       &lt;p&gt;本文主要描述xilinx 7系列位流中，bit位交换的功能。&lt;/p&gt;
-    
-    </summary>
-    
-    
-      <category term="Xilinx 7系列配置" scheme="https://www.cdutcl.com/categories/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/"/>
-    
-    
-      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>(Xilinx-7系配置2) 位流位宽检测机理</title>
-    <link href="https://www.cdutcl.com/posts/60ffd69e/"/>
-    <id>https://www.cdutcl.com/posts/60ffd69e/</id>
-    <published>2018-04-12T12:49:06.000Z</published>
-    <updated>2020-03-16T14:06:03.447Z</updated>
-    
-    <content type="html"><![CDATA[<p>本文主要介绍xilinx7系列在上电加载时，对总线位宽自动检测的机制。</p><a id="more"></a><h2 id="位宽检测"><a href="#位宽检测" class="headerlink" title="位宽检测"></a>位宽检测</h2><p>每个位流的头部，都有一个用于位宽检测的数据，在并行配置模式时，自动检测总线位宽。<br>检测机理如下：<br><img src="https://s1.ax1x.com/2020/03/12/8ZMWQK.png" alt="8ZMWQK.png"><br>如上图所示：<br>上面8个字节数据就是用于检测总线宽度，FPGA内部仅仅判断低8位数据，当发现BB开始判断位宽，根据后面数据是啥，就知道当前总线宽度了：</p><h3 id="1-8位模式判断"><a href="#1-8位模式判断" class="headerlink" title="1. 8位模式判断"></a>1. 8位模式判断</h3><p>数据按字节输入：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">00-&gt;00-&gt;00-&gt;BB-&gt;11-&gt;22-&gt;00-&gt;44-&gt;</span><br></pre></td></tr></table></figure><p>判断到BB后紧跟着11，说明总线是8位宽度；</p><h3 id="2-16位模式判断"><a href="#2-16位模式判断" class="headerlink" title="2. 16位模式判断"></a>2. 16位模式判断</h3><p>数据按双字节输入：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0000-&gt;00BB-&gt;1122-&gt;0044-&gt;</span><br></pre></td></tr></table></figure><p>低8位中，BB后紧跟着22，说明总线是16位宽度；</p><h3 id="3-32位模式判断"><a href="#3-32位模式判断" class="headerlink" title="3. 32位模式判断"></a>3. 32位模式判断</h3><p>数据按四字节输入：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">000000BB-&gt;11220044-&gt;</span><br></pre></td></tr></table></figure><p>低8位中，BB后紧跟着44，说明总线是32位宽度；</p><p>根据如上机理，即可判断总线宽度。</p><hr>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;本文主要介绍xilinx7系列在上电加载时，对总线位宽自动检测的机制。&lt;/p&gt;
-    
-    </summary>
-    
-    
-      <category term="Xilinx 7系列配置" scheme="https://www.cdutcl.com/categories/Xilinx-7%E7%B3%BB%E5%88%97%E9%85%8D%E7%BD%AE/"/>
-    
-    
-      <category term="XILINX" scheme="https://www.cdutcl.com/tags/XILINX/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>(Xilinx-7系配置1) 数据文件格式</title>
-    <link href="https://www.cdutcl.com/posts/df2d2b3/"/>
-    <id>https://www.cdutcl.com/posts/df2d2b3/</id>
-    <published>2018-04-11T11:33:10.000Z</published>
-    <updated>2020-03-16T14:05:55.639Z</updated>
-    
-    <content type="html"><![CDATA[<p>Xilinx的配置文件格式多种多样，bit、rbt、bin、mcs等等，本文主要介绍这些格式的文件都有什么差异，在什么场景下用什么文件。</p><a id="more"></a><h2 id="配置文件后缀"><a href="#配置文件后缀" class="headerlink" title="配置文件后缀"></a>配置文件后缀</h2><h3 id="1-bit格式"><a href="#1-bit格式" class="headerlink" title="1. bit格式"></a>1. bit格式</h3><p>默认生成文件类型，包含一些冗余的头部信息，这些头部信息是不需要下载到FPGA里面的。bit文件可以直接通过jtag加载到fpga中，掉电消失。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMmGt.png" alt="8ZMmGt.png"></p><h3 id="2-rbt格式"><a href="#2-rbt格式" class="headerlink" title="2. rbt格式"></a>2. rbt格式</h3><p>在ISE中使能了-b选项、在vivado中使能了-raw_bitfile选项，就可以生成该文件，该文件内容和bit一致，只是说这个是ASCII格式，bit是bin格式。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMePI.png" alt="8ZMePI.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMVIA.png" alt="8ZMVIA.png"></p><h3 id="3-bin格式"><a href="#3-bin格式" class="headerlink" title="3. bin格式"></a>3. bin格式</h3><p>在ISE中使能了-g binary:yes选项、在vivado中使能了-bin_file选项，就可以生成该文件，该文件内容相当于bit文件剔除了头部冗余信息。后面完全一致。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMAVH.png" alt="8ZMAVH.png"><br><img src="https://s1.ax1x.com/2020/03/12/8ZMEad.png" alt="8ZMEad.png"></p><h3 id="4-mcs格式"><a href="#4-mcs格式" class="headerlink" title="4. mcs格式"></a>4. mcs格式</h3><p>在vivado中，使用write_cfgmem -format mcs命令可以将bit文件转换成mcs文件，mcs文件也是ASCII格式，可以直接用文本工具打开，主要是在bin的基础上，增加了地址信息和校验信息。<br><img src="https://s1.ax1x.com/2020/03/12/8ZMnRP.png" alt="8ZMnRP.png"></p><hr>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Xilinx的配置文件格式多种多样，bit、rbt、bin、mcs等等，本文主要介绍这些格式的文件都有什么差异，在什么场景下用什么文件。&lt;/p&gt;
     
     </summary>
     

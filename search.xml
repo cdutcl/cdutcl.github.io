@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>(Xilinx-7系资源1) 7K325T各种资源概述</title>
+    <url>/posts/40fde24b/</url>
+    <content><![CDATA[<p>我们在做FPGA选型的时候，经过会考虑FPGA有多少资源，那么这些资源是怎么组合起来的呢？本文就xilinx 7k325t型号，详细描述各个资源在芯片中处的位置。</p>
+<a id="more"></a>
+<h2 id="资源概览"><a href="#资源概览" class="headerlink" title="资源概览"></a>资源概览</h2><p>首先，我们看看7K325T的资源列表：<br><img src="https://s1.ax1x.com/2020/03/23/8Tbqwn.png" alt="8Tbqwn.png"><br>图片来自xilinx官方文档ds180，从图中可以看出xc7k325t含有的各种资源的具体数量，例如含有16个GTX、10个CMT等等。那么，这些资源是怎么拼凑出来的呢？</p>
+<p>在我另外一篇文章中介绍时钟架构时，列出了芯片的时钟区域图：<br><a href="https://www.cdutcl.com/posts/600eb62d/">(Xilinx-7系时钟1) 时钟架构概述</a><br><img src="https://s1.ax1x.com/2020/03/20/8cmQTs.png" alt="shizhiquyu"><br>这个图就是芯片内部资源的分布图，接下来我们就一步一步慢慢剖析各种资源的所处位置。</p>
+<h2 id="Logic-Cells"><a href="#Logic-Cells" class="headerlink" title="Logic Cells"></a>Logic Cells</h2><p>首先，我们要明确一个概念，逻辑单元(Logic Cells)不是一个事实存在的资源，它是抽象出来的一个概念。在早期的Xilinx技术中，当时还是采用的4输入LUT，当时为了计算逻辑规模，采用的系数是1.25，就是说：LUT x 1.25 = 逻辑单元。后来技术升级，现在xilinx采用的是6输入LUT，所以把系数调整为了1.6。上面资源汇总图中可以看出，Slice的数量是50950，而每个Slice中含有4个LUT，所以325T的LUT数量为203800，在ug474中也可以得到此数据：<br><img src="https://s1.ax1x.com/2020/03/23/879m5Q.png" alt="879m5Q.png"><br>所以说，逻辑单元的数据就是：203800 x 1.6 = 326080  </p>
+<h2 id="Slices"><a href="#Slices" class="headerlink" title="Slices"></a>Slices</h2><p>我们打开一个325T的器件图，如下图所示：<br><img src="https://s1.ax1x.com/2020/03/23/87Euwt.png" alt="87Euwt.png"><br>在上图中，我们找到右上角的Slice，然后可以看出他的位置是X145Y349，也就是说水平方向排布了146个Slice，竖直方向上有350个Slice。而图中也可以看出在右边上面4个区域会窄一些，下面三个时钟区域会宽一些，下面三个区域的水平方向上实际有154个Slice。简单可以计算出：154 x 350 = 53900，减去右上角多计算出来的：200 x 8 = 1600，Slice数量应该是53900-1600=52300，但我们从最开始的汇总表格中可以看到，Slice实际数量是50950，和我们计算出来相差了1350个，为什么呢？于是放大器件图，看到还有两块区域我们多算了：<br><img src="https://s1.ax1x.com/2020/03/23/87n8qH.png" alt="87n8qH.png"><br>两块区域分别是1200和150，正好是我们多数出来的，由此可以得到Slice的准确数量50950。  </p>
+<h2 id="DSP"><a href="#DSP" class="headerlink" title="DSP"></a>DSP</h2><p>我们继续从325T的器件图上看，绿色的竖列就是DSP：<br><img src="https://s1.ax1x.com/2020/03/23/87ljqU.png" alt="87ljqU.png"><br>每个时钟区域中垂直方向上有20个DSP，每个区域种有3列DSP，所以总共可以计算出：20 x 3 x 14 = 840，这个数据和汇总表格中吻合。  </p>
+<h2 id="BRAM"><a href="#BRAM" class="headerlink" title="BRAM"></a>BRAM</h2><p>和DSP资源类似，我们可以看出BRAM也有专门的列，从图中可以看出左边的区域有3列BRAM，右边的区域有4列BRAM，每个区域的BRAM列是10个，所以可以计算出：<br>10 x (3+4) x 7 = 490个，这数据又和汇总表格不一致了，我们接着看：<br><img src="https://s1.ax1x.com/2020/03/23/8732B8.png" alt="8732B8.png"><br>在器件图的右边上面4个区域要窄一些，所以少了一列BRAM也就是40个，然后由于PCIe硬核的占位，又少了5个BRAM，所以总的BRAM数量是445个，这个和汇总表格也对上了。我们刚刚数的是36Kb BRAM的数量，而18Kb BRAM其实是36Kb BRAM里面的子集，一个36Kb BRAM里面，含有两个18Kb BRAM，所以18Kb BRAM的数量是890个：<br><img src="https://s1.ax1x.com/2020/03/23/87GJeK.png" alt="87GJeK.png"><br>445 x 36K = 16020K，这个数据都和汇总表格一致。</p>
+<h2 id="CMT"><a href="#CMT" class="headerlink" title="CMT"></a>CMT</h2><p>我们来看一下IO Bank的分布图：<br><img src="https://s1.ax1x.com/2020/03/23/87JzCQ.png" alt="87JzCQ.png"><br>BANK12<del>BANK18是HR bank，BANK32</del>BANK34是HP bank，BANK115~BANK118是GT bank，除了GT bank以外，每个bank含有一个CMT资源，所以CMT个数是10个。</p>
+<h2 id="PCIe"><a href="#PCIe" class="headerlink" title="PCIe"></a>PCIe</h2><p>325T含有一个PCIe2.0硬核，处于芯片的这个位置：<br><img src="https://s1.ax1x.com/2020/03/23/87YDVf.png" alt="87YDVf.png"></p>
+<h2 id="GTX"><a href="#GTX" class="headerlink" title="GTX"></a>GTX</h2><p>如上图的右上角，有4个BANK是GTX，每个BANK含有4个GT收发通道，所以一共有16个GT。</p>
+<h2 id="XADC"><a href="#XADC" class="headerlink" title="XADC"></a>XADC</h2><p>325T含有XADC资源，处于芯片的这个位置：<br><img src="https://s1.ax1x.com/2020/03/23/87t3yn.png" alt="87t3yn.png"></p>
+<h2 id="I-O"><a href="#I-O" class="headerlink" title="I/O"></a>I/O</h2><p>对于不同封装的325T来说，内部资源其实都是一样的，只是在不同的封装，引出不同的IO而已，如CMT的图所示，IO bank一共有10个，每个BANK有50个通用IO，所以最多500个IO，根据封装不同，实际能用的IO不一。</p>
+<p>通过上述描述，相信你对325T这个型号的FPGA的资源分布，应该有了一个整体的概念。有了这些基本印象，在我们开发项目时构思整体工程的时候，对你所使用的资源分布，就会有一个整体概念。</p>
+]]></content>
+      <categories>
+        <category>Xilinx 7系列资源</category>
+      </categories>
+      <tags>
+        <tag>XILINX</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Ubuntu18.04安装中文支持</title>
     <url>/posts/87fd19ae/</url>
     <content><![CDATA[<p>本来主要描述Ubuntu18.04系统中，安装中文支持的方法，内容主要参考网络文章，自己尝试后编辑成文。</p>

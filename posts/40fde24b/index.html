@@ -23,22 +23,32 @@
     var CONFIG = {"hostname":"www.cdutcl.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="本文整理总结了Git针对远程库的基本操作。大部分内容参考了网上资料，然后根据自己理解整理成文。">
+  <meta name="description" content="我们在做FPGA选型的时候，经过会考虑FPGA有多少资源，那么这些资源是怎么组合起来的呢？本文就xilinx 7k325t型号，详细描述各个资源在芯片中处的位置。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Git远程操作">
-<meta property="og:url" content="https://www.cdutcl.com/posts/65cd9483/index.html">
+<meta property="og:title" content="(Xilinx-7系资源1) 7K325T各种资源概述">
+<meta property="og:url" content="https://www.cdutcl.com/posts/40fde24b/index.html">
 <meta property="og:site_name" content="CDUTCL">
-<meta property="og:description" content="本文整理总结了Git针对远程库的基本操作。大部分内容参考了网上资料，然后根据自己理解整理成文。">
+<meta property="og:description" content="我们在做FPGA选型的时候，经过会考虑FPGA有多少资源，那么这些资源是怎么组合起来的呢？本文就xilinx 7k325t型号，详细描述各个资源在芯片中处的位置。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://s1.ax1x.com/2020/03/12/8ZQynS.jpg">
-<meta property="article:published_time" content="2020-02-27T07:16:48.000Z">
-<meta property="article:modified_time" content="2020-03-16T14:00:43.215Z">
+<meta property="og:image" content="https://s1.ax1x.com/2020/03/23/8Tbqwn.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/03/20/8cmQTs.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/03/23/879m5Q.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/03/23/87Euwt.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/03/23/87n8qH.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/03/23/87ljqU.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/03/23/8732B8.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/03/23/87GJeK.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/03/23/87JzCQ.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/03/23/87YDVf.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/03/23/87t3yn.png">
+<meta property="article:published_time" content="2020-03-21T14:08:59.000Z">
+<meta property="article:modified_time" content="2020-03-23T08:49:21.062Z">
 <meta property="article:author" content="cdutcl">
-<meta property="article:tag" content="GIT">
+<meta property="article:tag" content="XILINX">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://s1.ax1x.com/2020/03/12/8ZQynS.jpg">
+<meta name="twitter:image" content="https://s1.ax1x.com/2020/03/23/8Tbqwn.png">
 
-<link rel="canonical" href="https://www.cdutcl.com/posts/65cd9483/">
+<link rel="canonical" href="https://www.cdutcl.com/posts/40fde24b/">
 
 
 <script id="page-configurations">
@@ -50,7 +60,7 @@
   };
 </script>
 
-  <title>Git远程操作 | CDUTCL</title>
+  <title>(Xilinx-7系资源1) 7K325T各种资源概述 | CDUTCL</title>
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-159222686-1"></script>
     <script>
@@ -210,7 +220,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/posts/65cd9483/">
+    <link itemprop="mainEntityOfPage" href="https://www.cdutcl.com/posts/40fde24b/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -223,7 +233,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Git远程操作
+          (Xilinx-7系资源1) 7K325T各种资源概述
         </h1>
 
         <div class="post-meta">
@@ -233,14 +243,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020/02/27 15:16:48" itemprop="dateCreated datePublished" datetime="2020-02-27T15:16:48+08:00">2020/02/27</time>
+              <time title="创建时间：2020/03/21 22:08:59" itemprop="dateCreated datePublished" datetime="2020-03-21T22:08:59+08:00">2020/03/21</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020/03/16 22:00:43" itemprop="dateModified" datetime="2020-03-16T22:00:43+08:00">2020/03/16</time>
+                <time title="修改时间：2020/03/23 16:49:21" itemprop="dateModified" datetime="2020-03-23T16:49:21+08:00">2020/03/23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -248,7 +258,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/LINUX/" itemprop="url" rel="index"><span itemprop="name">LINUX</span></a>
+                  <a href="/categories/Xilinx-7%E7%B3%BB%E5%88%97%E8%B5%84%E6%BA%90/" itemprop="url" rel="index"><span itemprop="name">Xilinx 7系列资源</span></a>
                 </span>
             </span>
 
@@ -265,14 +275,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
+              <span>1.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -284,40 +294,20 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>本文整理总结了Git针对远程库的基本操作。<br>大部分内容参考了网上资料，然后根据自己理解整理成文。</p>
+        <p>我们在做FPGA选型的时候，经过会考虑FPGA有多少资源，那么这些资源是怎么组合起来的呢？本文就xilinx 7k325t型号，详细描述各个资源在芯片中处的位置。</p>
 <a id="more"></a>
-
-<hr>
-<p>Git远程操作主要有以下几个命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ git remote</span><br><span class="line">$ git <span class="built_in">clone</span></span><br><span class="line">$ git pull</span><br><span class="line">$ git push</span><br><span class="line">$ git fetch</span><br></pre></td></tr></table></figure>
-<p><img src="https://s1.ax1x.com/2020/03/12/8ZQynS.jpg" alt="8ZQynS.jpg"></p>
-<h2 id="git-remote"><a href="#git-remote" class="headerlink" title="git remote"></a>git remote</h2><p>该命令用于设置查看远程仓库，使用方式如下。</p>
-<p>设置远程链接</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git remote add origin https://github.com/cdutcl/ebaz4205_demo.git</span><br></pre></td></tr></table></figure>
-
-<p>查看远程链接</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git remote -v</span><br><span class="line">origin  https://github.com/cdutcl/ebaz4205_demo.git (fetch)</span><br><span class="line">origin  https://github.com/cdutcl/ebaz4205_demo.git (push)</span><br></pre></td></tr></table></figure>
-
-<p>删除远程链接</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git remote rm origin</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="git-clone"><a href="#git-clone" class="headerlink" title="git clone"></a>git clone</h2><p>该命令用于克隆一个远程库，用了该命令后，会在本地建立一个和网上一样的库。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> https://github.com/cdutcl/ebaz4205_demo.git</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="git-fetch"><a href="#git-fetch" class="headerlink" title="git fetch"></a>git fetch</h2><p>该命令会在本地新建一个origin/master分支，然后下载远程仓库到本地，但是不影响本地master分支。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ git fetch origin</span><br><span class="line">From https://github.com/cdutcl/ebaz4205_demo</span><br><span class="line"> * [new branch]      master     -&gt; origin/master</span><br><span class="line"></span><br><span class="line">$ git branch -a</span><br><span class="line">* master</span><br><span class="line">  remotes/origin/master</span><br></pre></td></tr></table></figure>
-<p>然后根据需要自行合并到本地自己的分支上。</p>
-<hr>
-<h2 id="git-pull"><a href="#git-pull" class="headerlink" title="git pull"></a>git pull</h2><p>这个是直接拉取远程分支，然后合并到本地，相当于fetch+merge操作。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ git pull master:master</span><br><span class="line">remote: Enumerating objects: 5, <span class="keyword">done</span>.</span><br><span class="line">remote: Counting objects: 100% (5/5), <span class="keyword">done</span>.</span><br><span class="line">remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0</span><br><span class="line">Unpacking objects: 100% (3/3), 649 bytes | 2.00 KiB/s, <span class="keyword">done</span>.</span><br><span class="line">From https://github.com/cdutcl/ebaz4205_demo</span><br><span class="line">   07c23e7..feff746  master     -&gt; origin/master</span><br></pre></td></tr></table></figure>
-<p>pull命令后面冒号前后分别是：&lt;远程分支名&gt;:&lt;本地分支名&gt;</p>
-<hr>
-<h2 id="git-push"><a href="#git-push" class="headerlink" title="git push"></a>git push</h2><p>该命令就是将本地分支推送到远程仓库。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ git push origin master</span><br><span class="line">Enumerating objects: 5, <span class="keyword">done</span>.</span><br><span class="line">Counting objects: 100% (5/5), <span class="keyword">done</span>.</span><br><span class="line">Delta compression using up to 8 threads</span><br><span class="line">Compressing objects: 100% (2/2), <span class="keyword">done</span>.</span><br><span class="line">Writing objects: 100% (3/3), 290 bytes | 48.00 KiB/s, <span class="keyword">done</span>.</span><br><span class="line">Total 3 (delta 0), reused 0 (delta 0)</span><br><span class="line">To https://github.com/cdutcl/ebaz4205_demo.git</span><br><span class="line">   feff746..c3c2834  master -&gt; master</span><br></pre></td></tr></table></figure>
-<p>push命令后面冒号前后分别是：&lt;本地分支名&gt;:&lt;远程分支名&gt;</p>
-<hr>
+<h2 id="资源概览"><a href="#资源概览" class="headerlink" title="资源概览"></a>资源概览</h2><p>首先，我们看看7K325T的资源列表：<br><img src="https://s1.ax1x.com/2020/03/23/8Tbqwn.png" alt="8Tbqwn.png"><br>图片来自xilinx官方文档ds180，从图中可以看出xc7k325t含有的各种资源的具体数量，例如含有16个GTX、10个CMT等等。那么，这些资源是怎么拼凑出来的呢？</p>
+<p>在我另外一篇文章中介绍时钟架构时，列出了芯片的时钟区域图：<br><a href="https://www.cdutcl.com/posts/600eb62d/">(Xilinx-7系时钟1) 时钟架构概述</a><br><img src="https://s1.ax1x.com/2020/03/20/8cmQTs.png" alt="shizhiquyu"><br>这个图就是芯片内部资源的分布图，接下来我们就一步一步慢慢剖析各种资源的所处位置。</p>
+<h2 id="Logic-Cells"><a href="#Logic-Cells" class="headerlink" title="Logic Cells"></a>Logic Cells</h2><p>首先，我们要明确一个概念，逻辑单元(Logic Cells)不是一个事实存在的资源，它是抽象出来的一个概念。在早期的Xilinx技术中，当时还是采用的4输入LUT，当时为了计算逻辑规模，采用的系数是1.25，就是说：LUT x 1.25 = 逻辑单元。后来技术升级，现在xilinx采用的是6输入LUT，所以把系数调整为了1.6。上面资源汇总图中可以看出，Slice的数量是50950，而每个Slice中含有4个LUT，所以325T的LUT数量为203800，在ug474中也可以得到此数据：<br><img src="https://s1.ax1x.com/2020/03/23/879m5Q.png" alt="879m5Q.png"><br>所以说，逻辑单元的数据就是：203800 x 1.6 = 326080  </p>
+<h2 id="Slices"><a href="#Slices" class="headerlink" title="Slices"></a>Slices</h2><p>我们打开一个325T的器件图，如下图所示：<br><img src="https://s1.ax1x.com/2020/03/23/87Euwt.png" alt="87Euwt.png"><br>在上图中，我们找到右上角的Slice，然后可以看出他的位置是X145Y349，也就是说水平方向排布了146个Slice，竖直方向上有350个Slice。而图中也可以看出在右边上面4个区域会窄一些，下面三个时钟区域会宽一些，下面三个区域的水平方向上实际有154个Slice。简单可以计算出：154 x 350 = 53900，减去右上角多计算出来的：200 x 8 = 1600，Slice数量应该是53900-1600=52300，但我们从最开始的汇总表格中可以看到，Slice实际数量是50950，和我们计算出来相差了1350个，为什么呢？于是放大器件图，看到还有两块区域我们多算了：<br><img src="https://s1.ax1x.com/2020/03/23/87n8qH.png" alt="87n8qH.png"><br>两块区域分别是1200和150，正好是我们多数出来的，由此可以得到Slice的准确数量50950。  </p>
+<h2 id="DSP"><a href="#DSP" class="headerlink" title="DSP"></a>DSP</h2><p>我们继续从325T的器件图上看，绿色的竖列就是DSP：<br><img src="https://s1.ax1x.com/2020/03/23/87ljqU.png" alt="87ljqU.png"><br>每个时钟区域中垂直方向上有20个DSP，每个区域种有3列DSP，所以总共可以计算出：20 x 3 x 14 = 840，这个数据和汇总表格中吻合。  </p>
+<h2 id="BRAM"><a href="#BRAM" class="headerlink" title="BRAM"></a>BRAM</h2><p>和DSP资源类似，我们可以看出BRAM也有专门的列，从图中可以看出左边的区域有3列BRAM，右边的区域有4列BRAM，每个区域的BRAM列是10个，所以可以计算出：<br>10 x (3+4) x 7 = 490个，这数据又和汇总表格不一致了，我们接着看：<br><img src="https://s1.ax1x.com/2020/03/23/8732B8.png" alt="8732B8.png"><br>在器件图的右边上面4个区域要窄一些，所以少了一列BRAM也就是40个，然后由于PCIe硬核的占位，又少了5个BRAM，所以总的BRAM数量是445个，这个和汇总表格也对上了。我们刚刚数的是36Kb BRAM的数量，而18Kb BRAM其实是36Kb BRAM里面的子集，一个36Kb BRAM里面，含有两个18Kb BRAM，所以18Kb BRAM的数量是890个：<br><img src="https://s1.ax1x.com/2020/03/23/87GJeK.png" alt="87GJeK.png"><br>445 x 36K = 16020K，这个数据都和汇总表格一致。</p>
+<h2 id="CMT"><a href="#CMT" class="headerlink" title="CMT"></a>CMT</h2><p>我们来看一下IO Bank的分布图：<br><img src="https://s1.ax1x.com/2020/03/23/87JzCQ.png" alt="87JzCQ.png"><br>BANK12<del>BANK18是HR bank，BANK32</del>BANK34是HP bank，BANK115~BANK118是GT bank，除了GT bank以外，每个bank含有一个CMT资源，所以CMT个数是10个。</p>
+<h2 id="PCIe"><a href="#PCIe" class="headerlink" title="PCIe"></a>PCIe</h2><p>325T含有一个PCIe2.0硬核，处于芯片的这个位置：<br><img src="https://s1.ax1x.com/2020/03/23/87YDVf.png" alt="87YDVf.png"></p>
+<h2 id="GTX"><a href="#GTX" class="headerlink" title="GTX"></a>GTX</h2><p>如上图的右上角，有4个BANK是GTX，每个BANK含有4个GT收发通道，所以一共有16个GT。</p>
+<h2 id="XADC"><a href="#XADC" class="headerlink" title="XADC"></a>XADC</h2><p>325T含有XADC资源，处于芯片的这个位置：<br><img src="https://s1.ax1x.com/2020/03/23/87t3yn.png" alt="87t3yn.png"></p>
+<h2 id="I-O"><a href="#I-O" class="headerlink" title="I/O"></a>I/O</h2><p>对于不同封装的325T来说，内部资源其实都是一样的，只是在不同的封装，引出不同的IO而已，如CMT的图所示，IO bank一共有10个，每个BANK有50个通用IO，所以最多500个IO，根据封装不同，实际能用的IO不一。</p>
+<p>通过上述描述，相信你对325T这个型号的FPGA的资源分布，应该有了一个整体的概念。有了这些基本印象，在我们开发项目时构思整体工程的时候，对你所使用的资源分布，就会有一个整体概念。</p>
 
     </div>
 
@@ -363,7 +353,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://www.cdutcl.com/posts/65cd9483/" title="Git远程操作">https://www.cdutcl.com/posts/65cd9483/</a>
+    <a href="https://www.cdutcl.com/posts/40fde24b/" title="(Xilinx-7系资源1) 7K325T各种资源概述">https://www.cdutcl.com/posts/40fde24b/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -374,7 +364,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/GIT/" rel="tag"><i class="fa fa-tag"></i> GIT</a>
+              <a href="/tags/XILINX/" rel="tag"><i class="fa fa-tag"></i> XILINX</a>
           </div>
 
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
@@ -396,13 +386,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/d82096fc/" rel="prev" title="Vivado2018.1闪退问题">
-      <i class="fa fa-chevron-left"></i> Vivado2018.1闪退问题
+    <a href="/posts/87fd19ae/" rel="prev" title="Ubuntu18.04安装中文支持">
+      <i class="fa fa-chevron-left"></i> Ubuntu18.04安装中文支持
     </a></div>
-      <div class="post-nav-item">
-    <a href="/posts/28c1a47d/" rel="next" title="EBAZ4205 Uboot移植过程">
-      EBAZ4205 Uboot移植过程 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -463,7 +450,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#git-remote"><span class="nav-number">1.</span> <span class="nav-text">git remote</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-clone"><span class="nav-number">2.</span> <span class="nav-text">git clone</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-fetch"><span class="nav-number">3.</span> <span class="nav-text">git fetch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-pull"><span class="nav-number">4.</span> <span class="nav-text">git pull</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-push"><span class="nav-number">5.</span> <span class="nav-text">git push</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#资源概览"><span class="nav-number">1.</span> <span class="nav-text">资源概览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Logic-Cells"><span class="nav-number">2.</span> <span class="nav-text">Logic Cells</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Slices"><span class="nav-number">3.</span> <span class="nav-text">Slices</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DSP"><span class="nav-number">4.</span> <span class="nav-text">DSP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BRAM"><span class="nav-number">5.</span> <span class="nav-text">BRAM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CMT"><span class="nav-number">6.</span> <span class="nav-text">CMT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PCIe"><span class="nav-number">7.</span> <span class="nav-text">PCIe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GTX"><span class="nav-number">8.</span> <span class="nav-text">GTX</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XADC"><span class="nav-number">9.</span> <span class="nav-text">XADC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#I-O"><span class="nav-number">10.</span> <span class="nav-text">I&#x2F;O</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -659,7 +646,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'cdutcl.github.io',
       owner       : 'cdutcl',
       admin       : ['cdutcl'],
-      id          : 'cbdabacb5bb8d29c2d57a6b5b7af82e4',
+      id          : '288aa21f950c6feb35bff1f3734834f7',
         language: 'zh-CN',
       distractionFreeMode: true
     });
